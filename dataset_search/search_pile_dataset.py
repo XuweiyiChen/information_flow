@@ -125,13 +125,13 @@ def medical_tokenize_function(examples):
 ds = load_dataset("ruslanmv/ai-medical-dataset", split="train[0:1]")
 ds = ds.shuffle(seed=42)
 samples_to_keep = [sample for sample in ds if len(sample["context"]) > 5]
-print(medical_tokenize_function(samples_to_keep[0])[0])
-# queries = [sample["context"] for sample in samples_to_keep][0:1050]
-# questions_metadata = [sample["question"] for sample in samples_to_keep][0:1050]
 
-# best_results = search_dataset(queries)
-# for idx in range(len(best_results)):
-#     best_results[idx]["question"] = questions_metadata[idx]
+queries = [sample["context"] for sample in samples_to_keep][0:1050]
+questions_metadata = [sample["question"] for sample in samples_to_keep][0:1050]
 
-# with open("best_results.pkl", "wb") as f:
-#     pickle.dump(best_results, f)
+best_results = search_dataset(queries)
+for idx in range(len(best_results)):
+    best_results[idx]["question"] = questions_metadata[idx]
+
+with open("best_results.pkl", "wb") as f:
+    pickle.dump(best_results, f)
