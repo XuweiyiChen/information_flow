@@ -61,7 +61,7 @@ def entropy_normalization(entropy, normalization, N, D):
     Returns:
         float: The normalized entropy value.
     """
-    assert normalization in ['maxEntropy', 'logN', 'logD', 'logNlogD', 'raw']
+    assert normalization in ['maxEntropy', 'logN', 'logD', 'logNlogD', 'raw', 'length']
 
     if normalization == 'maxEntropy':
         entropy /= min(math.log(N), math.log(D))
@@ -73,10 +73,21 @@ def entropy_normalization(entropy, normalization, N, D):
         entropy /= (math.log(N) * math.log(D))
     elif normalization == 'raw':
         pass
+    elif normalization == 'length':
+        entropy = N
 
     return entropy
 
-def compute_per_forward_pass(model, dataloader, compute_function, max_samples=1000, **kwargs):
+def hacky_collation(batch):
+    ips = [item['input_ids'] for item in batch]
+    attn = [item['attention_mask'] for item in batch]
+
+    return {'input_ids': torch.stack(ips),
+            'attention_mask': torch.stack(attn),
+            }
+
+
+def compute_per_forward_pass(model, dataloader, compute_function, max_samples=100, should_average_over_layers=True, **kwargs):
     """
     Compute a metric for each forward pass through the model.
 
@@ -93,24 +104,35 @@ def compute_per_forward_pass(model, dataloader, compute_function, max_samples=10
     results = {}
     counter = 0
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=max_samples, disable=DISABLE_TQDM):
-            counter += 1
+        num_batches = len(dataloader)
+        for batch in tqdm.tqdm(dataloader, total=max_samples, disable=DISABLE_TQDM, desc="Processing batches"):
+            batch_size = batch['input_ids'].shape[0]
+            counter += batch_size
             batch = {k: v.to(model.device) for k, v in batch.items()}
+
+            # squeeze if needed
+            if len(batch['input_ids'].shape) == 3:
+                batch = {k: v.squeeze() for k, v in batch.items()}
+
             outputs = model(**batch)
             
-            hidden_states = [normalize(x.squeeze()) for x in outputs.hidden_states]
-            hidden_states = torch.stack(hidden_states) # L x NUM_TOKENS x D
+            for sample_idx in range(batch_size):
+                hidden_states = [normalize(x[sample_idx]) for x in outputs.hidden_states]
+                hidden_states = torch.stack(hidden_states) # L x NUM_TOKENS x D
 
-            batch_result = compute_function(hidden_states, **kwargs)
-            for norm, values in batch_result.items():
-                if norm not in results:
-                    results[norm] = []
-                results[norm].append(values)
-
+                sample_result = compute_function(hidden_states, **kwargs)
+                for norm, values in sample_result.items():
+                    if norm not in results:
+                        results[norm] = []
+                    results[norm].append(values)
+                    
             if counter >= max_samples:
                 break
 
-    return {norm: np.array(values).mean(axis=0) for norm, values in results.items()}
+    if should_average_over_layers:
+        return {norm: np.array(values).mean(axis=0) for norm, values in results.items()}
+    else:
+        return {norm: np.array(values) for norm, values in results.items()}
 
 def compute_on_concatenated_passes(model, dataloader, compute_function, max_samples=1000, **kwargs):
     """
@@ -272,12 +294,34 @@ def compute_curvature(hidden_states, k=1):
     L, N, D = hidden_states.shape
 
     def calculate_paired_curvature(a, b):
-        return torch.arccos(a.T @ b).item()
+        dotproduct = torch.abs(a.T @ b)
+        norm_a = torch.norm(a)
+        norm_b = torch.norm(b)
+
+        if norm_a == 0 or norm_b == 0:
+            return 0
+
+        argument = torch.clamp(dotproduct / (norm_a * norm_b), min=-1, max=1)
+        curvature = torch.arccos(argument)
+        
+        if torch.isnan(curvature):
+            print(a)
+            print(b)
+            print(curvature)
+            print(dotproduct)
+            print(norm_a)
+            print(norm_b)
+            print(dotproduct / (norm_a * norm_b))
+            raise Exception("Curvature is NaN")
+        return curvature.item()
 
     def calculate_layer_average_k_curvature(layer_p):
         summation, counter = 0, 0
-        for i in range(layer_p.shape[0] - k):
-            summation += calculate_paired_curvature(layer_p[i].unsqueeze(1), layer_p[i+k].unsqueeze(1))
+        for k in range(1, layer_p.shape[0]-1):
+            v_k = layer_p[k].unsqueeze(1) - layer_p[k-1].unsqueeze(1)
+            v_kplusone = layer_p[k+1].unsqueeze(1) - layer_p[k].unsqueeze(1)
+            curvature = calculate_paired_curvature(v_kplusone, v_k)
+            summation += curvature
             counter += 1
         return summation / counter if counter > 0 else 0
 

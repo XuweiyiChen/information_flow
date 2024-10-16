@@ -6,14 +6,13 @@ import gc
 import tqdm
 import numpy as np
 import torch
-from transformers import AutoModel, AutoTokenizer, AutoConfig
+from transformers import AutoModel, AutoTokenizer, AutoConfig, AutoModelForCausalLM
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
 from ..misc.model_dataloader_utils import get_model_path, model_name_to_sizes
 from ..misc.batch_size_utils import find_optimal_batch_size
 from llm2vec import LLM2Vec
-
 
 class ModelSpecifications:
     def __init__(self, model_family, model_size, revision):
@@ -29,7 +28,8 @@ class ModelSpecifications:
             assert self.model_family == "Pythia"
             assert self.model_size in ["14m", "410m"]
 
-        assert self.model_family in model_name_to_sizes.keys()
+        assert self.model_family in model_name_to_sizes.keys(), \
+            f"Model family {self.model_family} not found, available families: {model_name_to_sizes.keys()}"
         assert self.model_size in model_name_to_sizes[self.model_family], \
             f"Model size {self.model_size} not found for model family {self.model_family}, available sizes: {model_name_to_sizes[self.model_family]}"
 

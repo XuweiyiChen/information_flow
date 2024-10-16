@@ -30,7 +30,7 @@
             "program": "experiments/mteb-harness.py",
             "console": "integratedTerminal",
             "args": [
-                "--model_family", "LLM2Vec-mntp-unsup-simcse",
+                "--model_family", "LLM2Vec-mntp",
                 "--model_size", "8B",
                 "--revision", "main",
                 "--evaluation_layer", "-1",

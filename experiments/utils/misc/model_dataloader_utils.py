@@ -27,7 +27,7 @@ model_types = ["cerebras",
                 "llama-instruct"]
 
 cerebras_sizes = ['111M', '256M', '590M', '1.3B', '2.7B', '6.7B', '13B'] # '13b' also exists but doesnt fit in 24G for bfloat16
-Pythia_sizes = ['14m', '70m', '160m', '410m', '1b', '1.4b', '2.8b']#, '6.9b'] # '12b' also exists but doesnt fit in 24G for bfloat16
+Pythia_sizes = ['14m', '70m', '160m', '410m', '1b', '1.4b', '2.8b', '6.9b'] # '12b' also exists but doesnt fit in 24G for bfloat16
 mamba_sizes = ['130m', '370m', '790m', '1.4b', '2.8b']
 mamba2_sizes = ['130m', '370m', '780m', '1.3b', '2.7b']
 bert_sizes = ['base', 'large']
@@ -147,7 +147,7 @@ def get_dataloader(
             text = medical_prompt.format(instruction,  output)
             texts.append(text)
 
-        return tokenizer(texts, truncation=True, max_length=1000)
+        return tokenizer(texts, truncation=True, max_length=max_sample_length)
     
     def adjust_context_length(examples):
         if context_length_ratio == 1:

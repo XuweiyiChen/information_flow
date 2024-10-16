@@ -122,7 +122,8 @@ def calculate_and_save_layerwise_metrics(
 
 def run_entropy_metrics(model, model_specs: ModelSpecifications, MTEB_evaluator: mteb.MTEB, args):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
-    metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'dataset-entropy']
+    #metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'dataset-entropy']
+    metrics = ['sentence-entropy']
     splits = ['train', 'test']
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
         print(f"Running evaluation for {task_dataset} - {metric} - {split}")
