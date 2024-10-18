@@ -1,7 +1,7 @@
 import torch
 import math
 import tqdm
-from .model_dataloader_utils import normalize
+from ..dataloaders.text_dataloader import normalize
 import repitl.matrix_itl as itl
 import repitl.difference_of_entropies as dent
 import numpy as np
@@ -86,8 +86,16 @@ def hacky_collation(batch):
             'attention_mask': torch.stack(attn),
             }
 
+# from https://github.com/waltonfuture/Matrix-Entropy
+def normalize(R):
+    with torch.no_grad():
+        mean = R.mean(dim=0)
+        R = R - mean
+        norms = torch.norm(R, p=2, dim=1, keepdim=True)
+        R = R/norms
+    return R
 
-def compute_per_forward_pass(model, dataloader, compute_function, max_samples=100, should_average_over_layers=True, **kwargs):
+def compute_per_forward_pass(model, dataloader, compute_function, should_average_over_layers=True, **kwargs):
     """
     Compute a metric for each forward pass through the model.
 
@@ -95,19 +103,15 @@ def compute_per_forward_pass(model, dataloader, compute_function, max_samples=10
         model (torch.nn.Module): The model to use for forward passes.
         dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
         compute_function (callable): The function to compute the metric.
-        max_samples (int): The maximum number of samples to process.
         **kwargs: Additional keyword arguments to pass to compute_function.
 
     Returns:
         dict: A dictionary of computed metrics, averaged over all samples.
     """
     results = {}
-    counter = 0
     with torch.no_grad():
-        num_batches = len(dataloader)
-        for batch in tqdm.tqdm(dataloader, total=max_samples, disable=DISABLE_TQDM, desc="Processing batches"):
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM, desc="Processing batches"):
             batch_size = batch['input_ids'].shape[0]
-            counter += batch_size
             batch = {k: v.to(model.device) for k, v in batch.items()}
 
             # squeeze if needed
@@ -117,7 +121,9 @@ def compute_per_forward_pass(model, dataloader, compute_function, max_samples=10
             outputs = model(**batch)
             
             for sample_idx in range(batch_size):
-                hidden_states = [normalize(x[sample_idx]) for x in outputs.hidden_states]
+                # ignore padding tokens
+                pad_idx = batch['attention_mask'][sample_idx] == 0
+                hidden_states = [normalize(x[sample_idx][~pad_idx]) for x in outputs.hidden_states]
                 hidden_states = torch.stack(hidden_states) # L x NUM_TOKENS x D
 
                 sample_result = compute_function(hidden_states, **kwargs)
@@ -125,16 +131,13 @@ def compute_per_forward_pass(model, dataloader, compute_function, max_samples=10
                     if norm not in results:
                         results[norm] = []
                     results[norm].append(values)
-                    
-            if counter >= max_samples:
-                break
 
     if should_average_over_layers:
         return {norm: np.array(values).mean(axis=0) for norm, values in results.items()}
     else:
         return {norm: np.array(values) for norm, values in results.items()}
 
-def compute_on_concatenated_passes(model, dataloader, compute_function, max_samples=1000, **kwargs):
+def compute_on_concatenated_passes(model, dataloader, compute_function, **kwargs):
     """
     Compute a metric on concatenated hidden states from multiple forward passes.
 
@@ -142,17 +145,14 @@ def compute_on_concatenated_passes(model, dataloader, compute_function, max_samp
         model (torch.nn.Module): The model to use for forward passes.
         dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
         compute_function (callable): The function to compute the metric.
-        max_samples (int): The maximum number of samples to process.
         **kwargs: Additional keyword arguments to pass to compute_function.
 
     Returns:
         dict: A dictionary of computed metrics.
     """
     all_hidden_states = []
-    counter = 0
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=max_samples, disable=DISABLE_TQDM):
-            counter += 1
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM):
             if not isinstance(batch, tuple):
                 batch = (batch,)
             
@@ -169,8 +169,6 @@ def compute_on_concatenated_passes(model, dataloader, compute_function, max_samp
                 batch_hidden_states.append(layer_means)
             
             all_hidden_states.append(torch.stack(batch_hidden_states)) # NUM_AUG x L x D
-            if counter >= max_samples:
-                break
 
     concatenated_states = torch.stack(all_hidden_states) # NUM_SAMPLES x NUM_AUG x L x D
     concatenated_states = concatenated_states.permute(2, 0, 1, 3) # L x NUM_SAMPLES x NUM_AUG x D

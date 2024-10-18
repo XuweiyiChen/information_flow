@@ -2,7 +2,7 @@ import os
 import pickle
 
 from utils.misc.metric_utils import EvaluationMetricSpecifications
-from utils.model_definitions.mteb_automodel_wrapper import ModelSpecifications
+from experiments.utils.model_definitions.text_automodel_wrapper import ModelSpecifications
 
 def save_results(results, model_specs: ModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
     model_family = model_specs.model_family

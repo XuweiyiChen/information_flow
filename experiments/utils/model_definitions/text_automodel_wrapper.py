@@ -1,0 +1,236 @@
+from typing import Any, Callable, List, Literal, Type, Dict, Union
+
+import tqdm
+import numpy as np
+import torch
+from transformers import AutoModel, AutoTokenizer, AutoConfig
+from torch.utils.data import DataLoader
+
+from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
+from ..misc.optimal_batch_size import find_optimal_batch_size
+from llm2vec import LLM2Vec
+
+
+model_types = ["cerebras",
+                "Pythia", 
+                "mamba", 
+                "mamba2", 
+                "Medical-Llama3", 
+                "Llama3", 
+                "bert", 
+                "LLM2Vec-mntp-unsup-simcse", 
+                "LLM2Vec-mntp-supervised",
+                "LLM2Vec-mntp",
+                "llama-instruct"]
+
+cerebras_sizes = ['111M', '256M', '590M', '1.3B', '2.7B', '6.7B', '13B'] # '13b' also exists but doesnt fit in 24G for bfloat16
+Pythia_sizes = ['14m', '70m', '160m', '410m', '1b', '1.4b', '2.8b', '6.9b'] # '12b' also exists but doesnt fit in 24G for bfloat16
+mamba_sizes = ['130m', '370m', '790m', '1.4b', '2.8b']
+mamba2_sizes = ['130m', '370m', '780m', '1.3b', '2.7b']
+bert_sizes = ['base', 'large']
+medical_llama3_sizes = ['8B'] # its only 8B model
+llama3_sizes = ['8B'] 
+LLM2Vec_sizes = ['8B']
+llama_instruct_sizes = ['8B']
+
+model_name_to_sizes = {
+    'Pythia': Pythia_sizes,
+    'cerebras': cerebras_sizes,
+    'mamba': mamba_sizes,
+    'mamba2': mamba2_sizes,
+    'Medical-Llama3': medical_llama3_sizes,
+    'Llama3': llama3_sizes,
+    'bert': bert_sizes,
+    'LLM2Vec-mntp-unsup-simcse': LLM2Vec_sizes,
+    'llama-instruct': llama_instruct_sizes,
+    'LLM2Vec-mntp-supervised': LLM2Vec_sizes,
+    'LLM2Vec-mntp': LLM2Vec_sizes,
+}
+
+
+def get_model_path(name, size):
+    assert name in model_types
+    if name == "cerebras":
+        assert size in cerebras_sizes
+        return f"cerebras/Cerebras-GPT-{size}"
+    elif name == "Pythia":
+        assert size in Pythia_sizes
+        return f"EleutherAI/pythia-{size}"
+    elif name == "Medical-Llama3":
+        assert size in medical_llama3_sizes
+        return f"ruslanmv/Medical-Llama3-8B"
+    elif name == "Llama3":
+        assert size in llama3_sizes
+        return f"meta-llama/Meta-Llama-3-8B"
+    elif name == "mamba":
+        assert size in mamba_sizes
+        return f"state-spaces/mamba-{size}-hf"
+    elif name == "mamba2":
+        assert size in mamba2_sizes
+        return f"state-spaces/mamba2-{size}-hf" 
+    elif name == "bert":
+        assert size in bert_sizes
+        return f"bert-{size}-uncased"
+    elif name == 'LLM2Vec-mntp-unsup-simcse':
+        assert size in LLM2Vec_sizes
+        return f"McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp"
+    elif name == 'LLM2Vec-mntp-supervised':
+        assert size in LLM2Vec_sizes
+        return f"McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp"
+    elif name == 'LLM2Vec-mntp':
+        assert size in LLM2Vec_sizes
+        return f"McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp"
+    elif name == "llama-instruct":
+        assert size in llama_instruct_sizes
+        return f"meta-llama/Meta-Llama-3-8B-Instruct"
+    else:
+        raise ValueError(f"Model type {name} not found")
+
+
+
+
+class TextModelSpecifications(BaseModelSpecifications):
+    def __init__(self, model_family, model_size, revision):
+        super().__init__(model_family, model_size, revision)
+        self.model_path_func = get_model_path
+
+    def additional_checks(self):
+        if self.revision != "main":
+            # currently only supporting 14m and 410m Pythia models for non-main checkpoints
+            assert self.model_family == "Pythia"
+            assert self.model_size in ["14m", "410m"]
+        
+        assert self.model_family in model_name_to_sizes.keys(), \
+            f"Model family {self.model_family} not found, available families: {model_name_to_sizes.keys()}"
+        assert self.model_size in model_name_to_sizes[self.model_family], \
+            f"Model size {self.model_size} not found for model family {self.model_family}, available sizes: {model_name_to_sizes[self.model_family]}"
+
+class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
+    def __init__(self, 
+                 model_specs: TextModelSpecifications, 
+                 device_map="auto", 
+                 evaluation_layer_idx: int = -1):
+        super().__init__(model_specs, device_map, evaluation_layer_idx)
+
+    """
+    FUNCTIONS FOR INITIALIZATION
+    """
+    def setup_input_processor(self):
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.padding_side = "left"
+        assert self.tokenizer.pad_token is not None
+
+    def setup_model(self):
+        self.config = AutoConfig.from_pretrained(self.model_path, 
+                                            revision=self.model_specs.revision,
+                                            output_hidden_states=True)
+        self.num_layers = self.config.num_hidden_layers + 1 
+        self.update_evaluation_layer(self.evaluation_layer_idx)
+        self.config.num_hidden_layers = self.evaluation_layer_idx
+
+        FROM_PRETRAINED_KWARGS = {
+            'revision': self.model_specs.revision,
+            'config': self.config,
+            'torch_dtype': torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
+            'device_map': self.device_map
+        }
+
+        if 'llm2vec' in self.model_path.lower():
+            MODEL_CLASS = LLM2Vec
+            if 'unsup' in self.model_specs.model_family.lower():
+                FROM_PRETRAINED_KWARGS['peft_model_name_or_path'] = "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-unsup-simcse"
+            elif 'supervised' in self.model_specs.model_family.lower():
+                FROM_PRETRAINED_KWARGS['peft_model_name_or_path'] = "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised"
+            elif self.model_specs.model_family.lower() == 'llm2vec-mntp':
+                pass
+            else:
+                raise ValueError(f"Model family {self.model_specs.model_family} not found")
+        else:
+            MODEL_CLASS = AutoModel
+
+        self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
+
+    """
+    FUNCTIONS FOR INFERENCE
+    """
+    @torch.no_grad()
+    def encode(
+        self,
+        input_data: List[str],
+        **kwargs: Any
+    ) -> np.ndarray:
+        max_sample_length = kwargs.pop("max_sample_length", 2048)
+        verbose = kwargs.pop("verbose", True)
+
+        tokenized_sentences =  self.tokenizer(input_data,
+                                            return_tensors="pt",
+                                            padding=True,
+                                            truncation=True,
+                                            max_length=max_sample_length)
+        
+        # find optimal batch size
+        optimal_batch_size = find_optimal_batch_size(model=self._get_model_with_forward_pass(), 
+                                                     number_of_samples=len(input_data),
+                                                     device=self._get_first_layer_device(),
+                                                     max_sentence_length = tokenized_sentences.input_ids.shape[1], 
+                                                     verbose=verbose)
+        self.batch_size_hint = optimal_batch_size
+
+        # create dataloader
+        dataset = [{"input_ids": ids, "attention_mask": mask} 
+            for ids, mask in zip(tokenized_sentences["input_ids"], 
+                                tokenized_sentences["attention_mask"])]
+        dataloader = DataLoader(dataset, 
+                                batch_size=optimal_batch_size, 
+                                shuffle=False, 
+                                num_workers=8, 
+                                collate_fn=self.collate)
+
+        embeddings = self._encode_helper(dataloader, verbose=verbose)
+
+        return np.array(embeddings)
+    
+    
+    def _get_model_with_forward_pass(self):
+        if 'llm2vec' in self.model_path.lower():
+            return self.model.model
+        else:
+            return self.model
+    
+    @torch.no_grad()
+    def _encode_helper(self, dataloader, verbose=False) -> np.ndarray:
+        encoded_batches = []
+
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable= not verbose):
+            batch = {k: v.to(self._get_first_layer_device()) for k, v in batch.items()}
+                
+            outputs = self.forward(**batch)
+            hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
+            hidden_states = self._get_pooled_hidden_states(hidden_states, batch["attention_mask"], method="mean")
+
+            encoded_batches.append(hidden_states.float().cpu())
+
+        encodings = torch.cat(encoded_batches).squeeze().numpy()
+        return encodings
+    
+    @torch.no_grad()
+    def _get_pooled_hidden_states(self, hidden_states, attention_mask, method="mean"):
+        if method == "mean":
+            seq_lengths = attention_mask.sum(dim=-1)
+            return torch.stack(
+                [
+                    hidden_states[i, -length:, :].mean(dim=0)
+                    for i, length in enumerate(seq_lengths)
+                ],
+                dim=0,
+            )
+        elif method == "mean_including_padding":
+            layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states])
+            return layer_means
+        
+        elif method == "last_hidden_state":
+            return hidden_states[:, -1]
+        else:
+            raise ValueError(f"Invalid pooling method: {method}")

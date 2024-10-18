@@ -11,14 +11,14 @@ import torch
 import mteb
 from transformers import AutoModel, AutoTokenizer
 
-from utils.model_definitions.mteb_automodel_wrapper import AutoModelWrapper, ModelSpecifications
+from experiments.utils.model_definitions.text_automodel_wrapper import AutoModelWrapper, ModelSpecifications
 from utils.misc.metric_utils import (
     compute_per_forward_pass,
     compute_on_concatenated_passes,
     metric_name_to_function,
     EvaluationMetricSpecifications
 )
-from utils.misc.model_dataloader_utils import (
+from experiments.utils.misc.text_dataloader import (
     model_name_to_sizes, 
     get_model_path, 
     get_dataloader, 
