@@ -25,19 +25,11 @@ from typing import Callable, List, Optional, Sequence, Type, Union
 import torch
 import torchvision
 from PIL import Image, ImageFilter, ImageOps
-from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 from torch.utils.data import DataLoader
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder
-
-try:
-    from solo.data.h5_dataset import H5Dataset
-except ImportError:
-    _h5_available = False
-else:
-    _h5_available = True
-
+from omegaconf import OmegaConf
 
 def dataset_with_index(DatasetClass: Type[Dataset]) -> Type[Dataset]:
     """Factory for datasets that also returns the data index.
@@ -203,18 +195,21 @@ def build_transform_pipeline(dataset, cfg):
             prob: float
     """
 
-    MEANS_N_STD = {
-        "cifar10": ((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
-        "cifar100": ((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
-        "stl10": ((0.4914, 0.4823, 0.4466), (0.247, 0.243, 0.261)),
-        "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
-        "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
-        "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    }
+    # MEANS_N_STD = {
+    #     "cifar10": ((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616)),
+    #     "cifar100": ((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762)),
+    #     "stl10": ((0.4914, 0.4823, 0.4466), (0.247, 0.243, 0.261)),
+    #     "imagenet100": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
+    #     "imagenet": (IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD),
+    #     "tiny-imagenet": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    # }
 
-    mean, std = MEANS_N_STD.get(
-        dataset, (cfg.get("mean", IMAGENET_DEFAULT_MEAN), cfg.get("std", IMAGENET_DEFAULT_STD))
-    )
+    # mean, std = MEANS_N_STD.get(
+    #     dataset, (cfg.get("mean", IMAGENET_DEFAULT_MEAN), cfg.get("std", IMAGENET_DEFAULT_STD))
+    # )
+
+    mean = cfg.normalize.mean
+    std = cfg.normalize.std
 
     augmentations = []
     if cfg.rrc.enabled:
@@ -396,3 +391,97 @@ def prepare_dataloader(
         drop_last=True,
     )
     return train_loader
+
+
+def simclr_imagenet_transform(mean, std):
+    aug_cfg = {
+        'crop_size': 224,
+        'rrc': {
+            'enabled': True,
+            'crop_min_scale': 0.08,
+            'crop_max_scale': 1.0,
+        },
+        'color_jitter': {
+            'prob': 0.8,
+            'brightness': 0.8,
+            'contrast': 0.8,
+            'saturation': 0.8,
+            'hue': 0.2,
+        },
+        'grayscale': {
+            'prob': 0.2
+        },
+        'gaussian_blur': {
+            'prob': 0.5
+        },
+        'solarization': {
+            'prob': 0.0
+        },
+        'equalization': {
+            'prob': 0.0
+        },
+        'horizontal_flip': {
+            'prob': 0.5
+        },
+        'normalize': {
+            'mean': mean,
+            'std': std
+        }
+    }
+    aug_cfg = OmegaConf.create(aug_cfg)
+    
+    transform = build_transform_pipeline('imagenet', aug_cfg)
+    transform = NCropAugmentation(transform, num_crops=2)
+    transform = FullTransformPipeline([transform])
+    return transform
+
+def simclr_imagenet_transform(mean, std):
+    aug_cfg = {
+        'crop_size': 224,
+        'rrc': {
+            'enabled': True,
+            'crop_min_scale': 0.08,
+            'crop_max_scale': 1.0,
+        },
+        'color_jitter': {
+            'prob': 0.8,
+            'brightness': 0.8,
+            'contrast': 0.8,
+            'saturation': 0.8,
+            'hue': 0.2,
+        },
+        'grayscale': {
+            'prob': 0.2
+        },
+        'gaussian_blur': {
+            'prob': 0.5
+        },
+        'solarization': {
+            'prob': 0.0
+        },
+        'equalization': {
+            'prob': 0.0
+        },
+        'horizontal_flip': {
+            'prob': 0.5
+        },
+        'normalize': {
+            'mean': mean,
+            'std': std
+        }
+    }
+    aug_cfg = OmegaConf.create(aug_cfg)
+    
+    transform = build_transform_pipeline('imagenet', aug_cfg)
+    transform = NCropAugmentation(transform, num_crops=2)
+    transform = FullTransformPipeline([transform])
+    return transform
+
+def validation_imagenet_transform(mean, std):
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=mean, std=std)
+    ])
+    return transform

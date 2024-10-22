@@ -12,7 +12,7 @@ import mteb
 from transformers import AutoModel, AutoTokenizer
 
 from experiments.utils.model_definitions.text_automodel_wrapper import AutoModelWrapper, ModelSpecifications
-from utils.misc.metric_utils import (
+from experiments.utils.misc.metric_functions import (
     compute_per_forward_pass,
     compute_on_concatenated_passes,
     metric_name_to_function,

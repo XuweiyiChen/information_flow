@@ -6,25 +6,63 @@ import gc
 import tqdm
 import numpy as np
 import torch
-from transformers import AutoModel, AutoImageProcessor, AutoConfig, AutoModelForCausalLM
+from transformers import AutoModel, AutoImageProcessor, AutoConfig, CLIPVisionModel, CLIPVisionConfig
+from transformers.models import dinov2
 from torch.utils.data import DataLoader
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from ..misc.optimal_batch_size import find_optimal_batch_size
-from llm2vec import LLM2Vec
 
-model_types = ['vit', 'dinov1', 'dinov2', 'mae']
+model_name_to_sizes = {
+    'sam': ['base'],
+    'vit_augreg': ['base'],
+    'vit': ['base', 'large', 'huge'],
+    'dinov1': ['base'],
+    'dinov2': ['small', 'base', 'large', 'giant'],
+    'mae': ['base', 'large', 'huge'],
+    'deit': ['base'],
+    'clip': ['base', 'large'],
+}
+model_types = list(model_name_to_sizes.keys())
+
 def get_model_path(name, size):
     assert name in model_types, f"Invalid model type {name}, valid types: {model_types}"
+    assert size in model_name_to_sizes[name], \
+        f"Invalid size {size} for model type {name}, valid sizes: {model_name_to_sizes[name]}"
     
     if name == 'vit':
-        return "google/vit-base-patch16-224-in21k"
+        patch_size = 16 if size != 'huge' else 14
+        dataset = "-in21k" if size == 'huge' else ""
+        return f"google/vit-{size}-patch{patch_size}-224{dataset}"
     elif name == 'dinov1':
-        return 'facebook/dino-vitb16'
+        return f'facebook/dino-vitb16'
     elif name == 'dinov2':
-        return 'facebook/dinov2-base'
+        return f'facebook/dinov2-{size}'
     elif name == 'mae':
-        return "facebook/vit-mae-base"
+        return f"facebook/vit-mae-{size}"
+    elif name == 'sam':
+        return "facebook/sam-vit-base"
+    elif name == 'vit_augreg':
+        return "timm/vit_base_patch16_224.augreg_in21k"
+    elif name == 'deit':
+        return "facebook/deit-base-distilled-patch16-224"
+    elif name == 'clip':
+        if size == 'base':
+            return "openai/clip-vit-base-patch16"
+        elif size == 'large':
+            return "openai/clip-vit-large-patch14"
+
+def update_config(config, model_specs):
+    if model_specs.model_family == 'mae':
+        config.mask_ratio = 0.
+
+    return config
+
+def get_model_and_config_classes(model_specs):
+    if model_specs.model_family == 'clip':
+        return CLIPVisionModel, CLIPVisionConfig
+    else:
+        return AutoModel, AutoConfig
 
 
 
@@ -50,22 +88,23 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
 
     def setup_model(self):
-        self.config = AutoConfig.from_pretrained(self.model_path, 
+        MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
+        self.config = CONFIG_CLASS.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
                                             output_hidden_states=True)
-        self.num_layers = self.config.num_hidden_layers + 1 
-        self.update_evaluation_layer(self.evaluation_layer_idx)
-        self.config.num_hidden_layers = self.evaluation_layer_idx
+        self.config = update_config(self.config, self.model_specs)
+        #self.num_layers = self.config.num_hidden_layers + 1 
+        #self.update_evaluation_layer(self.evaluation_layer_idx)
+        #self.config.num_hidden_layers = self.evaluation_layer_idx
 
         FROM_PRETRAINED_KWARGS = {
             'revision': self.model_specs.revision,
             'config': self.config,
-            'torch_dtype': torch.float32,
-            #'torch_dtype': torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
+            'torch_dtype': torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
             'device_map': self.device_map if False else None
         }
 
-        self.model = AutoModel.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
+        self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
 
         if FROM_PRETRAINED_KWARGS['device_map'] is None:
             self.model.to("cuda")

@@ -1,10 +1,12 @@
 import os
 import pickle
 
-from utils.misc.metric_utils import EvaluationMetricSpecifications
-from experiments.utils.model_definitions.text_automodel_wrapper import ModelSpecifications
+from ..misc.metric_functions import EvaluationMetricSpecifications
+from ..model_definitions.base_automodel_wrapper import BaseModelSpecifications
 
-def save_results(results, model_specs: ModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+BASE_PATH = "large_results"
+
+def construct_file_path(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
     model_family = model_specs.model_family
     model_size = model_specs.model_size
     revision = model_specs.revision
@@ -15,24 +17,21 @@ def save_results(results, model_specs: ModelSpecifications, evaluation_metric_sp
     if evaluation_metric == 'entropy':
         evaluation_metric = f"{evaluation_metric}_{granularity}"
 
-    save_dir = f"results/{model_family}/{model_size}/{revision}/metrics/{dataset}/"
-    os.makedirs(save_dir, exist_ok=True)
-    with open(f"{save_dir}/{evaluation_metric}.pkl", "wb") as f:
+    return f"{BASE_PATH}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
+
+def save_results(results, model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "wb") as f:
         pickle.dump(results, f)
-        
-def load_results(model_specs: ModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
-    model_family = model_specs.model_family
-    model_size = model_specs.model_size
-    revision = model_specs.revision
-    evaluation_metric = evaluation_metric_specs.evaluation_metric
-    granularity = evaluation_metric_specs.granularity
-    dataset = dataloader_kwargs['dataset_name']
 
-    if evaluation_metric == 'entropy':
-        evaluation_metric = f"{evaluation_metric}_{granularity}"
+def check_if_results_exist(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
+    return os.path.exists(file_path)
 
-    load_dir = f"results/{model_family}/{model_size}/{revision}/metrics/{dataset}/"
-    file_path = f"{load_dir}/{evaluation_metric}.pkl"
+
+def load_results(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
 
     try:
         with open(file_path, "rb") as f:
@@ -45,7 +44,7 @@ def load_results(model_specs: ModelSpecifications, evaluation_metric_specs: Eval
 def load_results_for_model_and_revisions(model_family, model_size, revisions, evaluation_metrics):
     results = {}
     for revision in revisions:
-        model_specs = ModelSpecifications(model_family, model_size, revision)
+        model_specs = BaseModelSpecifications(model_family, model_size, revision)
         for evaluation_metric in evaluation_metrics:
             evaluation_metric_specs = EvaluationMetricSpecifications(evaluation_metric)
             dataloader_kwargs = {'dataset_name': 'wikitext'}
@@ -54,7 +53,7 @@ def load_results_for_model_and_revisions(model_family, model_size, revisions, ev
 
 def load_all_results():
     all_results = {}
-    results_dir = "results"
+    results_dir = BASE_PATH
 
     for model_family in os.listdir(results_dir):
         model_family_path = os.path.join(results_dir, model_family)

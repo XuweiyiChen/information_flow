@@ -32,6 +32,13 @@ class BaseModelSpecifications:
     def additional_checks(self):
         raise NotImplementedError("This is a base class, please implement the additional_checks method")
     
+    def __str__(self):
+        return f"""
+        Model family: {self.model_family}
+        Model size: {self.model_size}
+        Revision: {self.revision}
+        """
+    
 class BaseLayerwiseAutoModelWrapper:
     """
     Base class for a wrapper around a huggingface model. 
@@ -54,7 +61,7 @@ class BaseLayerwiseAutoModelWrapper:
 
         self.setup_input_processor()
         self.setup_model()
-        self.update_evaluation_layer(self.evaluation_layer_idx)
+        #self.update_evaluation_layer(self.evaluation_layer_idx)
 
     """
     BASE FUNCTIONS
@@ -98,6 +105,13 @@ class BaseLayerwiseAutoModelWrapper:
     @property
     def device(self):
         return self._get_first_layer_device()
+    
+    @property
+    def dtype(self):
+        if self._model_is_nested():
+            return self.model.model.dtype
+        else:
+            return self.model.dtype
     
     def forward(self, **kwargs):
         model_with_forward_pass = self._get_model_with_forward_pass()

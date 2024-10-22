@@ -1,7 +1,6 @@
 import torch
 import math
 import tqdm
-from ..dataloaders.text_dataloader import normalize
 import repitl.matrix_itl as itl
 import repitl.difference_of_entropies as dent
 import numpy as np
