@@ -59,8 +59,9 @@ class BaseLayerwiseAutoModelWrapper:
         self.device_map = device_map
         self.evaluation_layer_idx = evaluation_layer_idx
 
-        self.setup_input_processor()
         self.setup_model()
+        self.setup_input_processor()
+
         #self.update_evaluation_layer(self.evaluation_layer_idx)
 
     """
@@ -110,8 +111,10 @@ class BaseLayerwiseAutoModelWrapper:
     def dtype(self):
         if self._model_is_nested():
             return self.model.model.dtype
-        else:
+        elif hasattr(self.model, 'dtype'):
             return self.model.dtype
+        else:
+            return torch.float32
     
     def forward(self, **kwargs):
         model_with_forward_pass = self._get_model_with_forward_pass()

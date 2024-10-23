@@ -9,6 +9,7 @@ import torch
 from transformers import AutoModel, AutoImageProcessor, AutoConfig, CLIPVisionModel, CLIPVisionConfig
 from transformers.models import dinov2
 from torch.utils.data import DataLoader
+import timm
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from ..misc.optimal_batch_size import find_optimal_batch_size
@@ -19,6 +20,7 @@ model_name_to_sizes = {
     'vit': ['base', 'large', 'huge'],
     'dinov1': ['base'],
     'dinov2': ['small', 'base', 'large', 'giant'],
+    'dinov2-register': ['small', 'base', 'large', 'giant'],
     'mae': ['base', 'large', 'huge'],
     'deit': ['base'],
     'clip': ['base', 'large'],
@@ -38,6 +40,8 @@ def get_model_path(name, size):
         return f'facebook/dino-vitb16'
     elif name == 'dinov2':
         return f'facebook/dinov2-{size}'
+    elif name == 'dinov2-register':
+        return f'timm/vit_{size}_patch14_reg4_dinov2.lvd142m'
     elif name == 'mae':
         return f"facebook/vit-mae-{size}"
     elif name == 'sam':
@@ -85,9 +89,26 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     FUNCTIONS FOR INITIALIZATION
     """
     def setup_input_processor(self):
-        self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
+        if 'timm' in self.model_path:
+           data_config = timm.data.resolve_model_data_config(self.model)
+           self.image_processor = timm.data.create_transform(**data_config, is_training=False)
+
+        else:
+            self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
+
+    def process_inputs(self, inputs):
+        if 'timm' in self.model_path:
+            return self.image_processor(inputs)
+        else:
+            return self.image_processor(**input, return_tensors="pt")
 
     def setup_model(self):
+        if 'timm' in self.model_path:
+            self.setup_timm_model()
+        else:
+            self.setup_huggingface_model()
+
+    def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
         self.config = CONFIG_CLASS.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
@@ -108,3 +129,16 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
 
         if FROM_PRETRAINED_KWARGS['device_map'] is None:
             self.model.to("cuda")
+
+    def setup_timm_model(self):
+        base_model_path = self.model_path.split('/')[1]
+        self.model = timm.create_model(base_model_path, pretrained=True, num_classes=0)
+        self.model = self.model.eval().cuda()
+
+    def __call__(self, **kwargs):
+        if 'timm' in self.model_path:
+            return {
+                'hidden_states': self.model.forward_intermediates(**kwargs, intermediates_only=True, output_fmt='NLC')
+            }
+        else:
+            return self.forward(**kwargs)
