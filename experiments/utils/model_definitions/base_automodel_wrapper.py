@@ -30,7 +30,8 @@ class BaseModelSpecifications:
         self.additional_checks()
 
     def additional_checks(self):
-        raise NotImplementedError("This is a base class, please implement the additional_checks method")
+        pass
+        #raise NotImplementedError("This is a base class, please implement the additional_checks method")
     
     def __str__(self):
         return f"""
@@ -145,4 +146,5 @@ class BaseLayerwiseAutoModelWrapper:
     def setup_model(self):
         raise NotImplementedError("This is a base class, please implement the setup_model method")
     
- 
+    def prepare_inputs(self, batch):
+        raise NotImplementedError("This is a base class, please implement the prepare_inputs method")

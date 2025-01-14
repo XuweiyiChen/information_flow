@@ -1,52 +1,10 @@
+import numpy as np
 import torch
 import math
-import tqdm
 import repitl.matrix_itl as itl
 import repitl.difference_of_entropies as dent
-import numpy as np
-
-# By default enabled, can be disabled by setting to True in the notebook
-DISABLE_TQDM = False
-
-class EvaluationMetricSpecifications:
-    def __init__(
-        self, 
-        evaluation_metric, 
-        num_samples = 1000, 
-        alpha = 1, 
-        normalizations = ['maxEntropy', 'raw', 'logN', 'logNlogD', 'logD'],
-        curvature_k = 1
-    ):
-        self.evaluation_metric = evaluation_metric
-        self.num_samples = num_samples
-
-        
-        if self.evaluation_metric == 'sentence-entropy':
-            self.granularity = 'sentence'
-            self.evaluation_metric = 'entropy'
-        elif self.evaluation_metric == 'dataset-entropy':
-            self.granularity = 'dataset'
-            self.evaluation_metric = 'entropy'
-        else:
-            self.granularity = None
-
-        # for matrix-based metrics (LIDAR, DIME, entropy)
-        self.normalizations = normalizations
-        self.alpha = alpha
-
-        # for curvature
-        self.curvature_k = curvature_k
-        
-        self.do_checks()
-
-    def do_checks(self):
-        assert self.evaluation_metric in metric_name_to_function.keys()
-        assert self.granularity in ['sentence', 'dataset', None]
-
-        assert self.alpha > 0
-        assert self.num_samples > 0
-        assert self.curvature_k > 0 and isinstance(self.curvature_k, int)
-
+from dadapy.data import Data as ID_DATA
+    
 def entropy_normalization(entropy, normalization, N, D):
     """
     Normalize the entropy based on the specified normalization method.
@@ -94,117 +52,6 @@ def normalize(R):
         R = R/norms
     return R
 
-def compute_per_forward_pass(model, dataloader, compute_function, should_average_over_layers=True, **kwargs):
-    """
-    Compute a metric for each forward pass through the model.
-
-    Args:
-        model (torch.nn.Module): The model to use for forward passes.
-        dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
-        compute_function (callable): The function to compute the metric.
-        **kwargs: Additional keyword arguments to pass to compute_function.
-
-    Returns:
-        dict: A dictionary of computed metrics, averaged over all samples.
-    """
-    results = {}
-    with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM, desc="Processing batches"):
-            batch_size = batch['input_ids'].shape[0]
-            batch = {k: v.to(model.device) for k, v in batch.items()}
-
-            # squeeze if needed
-            if len(batch['input_ids'].shape) == 3:
-                batch = {k: v.squeeze() for k, v in batch.items()}
-
-            outputs = model(**batch)
-            
-            for sample_idx in range(batch_size):
-                # ignore padding tokens
-                pad_idx = batch['attention_mask'][sample_idx] == 0
-                hidden_states = [normalize(x[sample_idx][~pad_idx]) for x in outputs.hidden_states]
-                hidden_states = torch.stack(hidden_states) # L x NUM_TOKENS x D
-
-                sample_result = compute_function(hidden_states, **kwargs)
-                for norm, values in sample_result.items():
-                    if norm not in results:
-                        results[norm] = []
-                    results[norm].append(values)
-
-    if should_average_over_layers:
-        return {norm: np.array(values).mean(axis=0) for norm, values in results.items()}
-    else:
-        return {norm: np.array(values) for norm, values in results.items()}
-
-def compute_on_concatenated_passes(model, dataloader, compute_function, **kwargs):
-    """
-    Compute a metric on concatenated hidden states from multiple forward passes.
-
-    Args:
-        model (torch.nn.Module): The model to use for forward passes.
-        dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
-        compute_function (callable): The function to compute the metric.
-        **kwargs: Additional keyword arguments to pass to compute_function.
-
-    Returns:
-        dict: A dictionary of computed metrics.
-    """
-    all_hidden_states = []
-    with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM):
-            if not isinstance(batch, tuple):
-                batch = (batch,)
-            
-            batch_hidden_states = []
-            for sub_batch in batch:
-                if len(batch) == 1:
-                    sub_batch = {k: v.to(model.device) for k, v in sub_batch.items()}
-                else:
-                    sub_batch = {k: v.unsqueeze(0).to(model.device) for k, v in sub_batch.items()}
-                
-                outputs = model(**sub_batch)
-                hidden_states = [normalize(x.squeeze()) for x in outputs.hidden_states] # L x NUM_TOKENS x D
-                layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states]) # L x D
-                batch_hidden_states.append(layer_means)
-            
-            all_hidden_states.append(torch.stack(batch_hidden_states)) # NUM_AUG x L x D
-
-    concatenated_states = torch.stack(all_hidden_states) # NUM_SAMPLES x NUM_AUG x L x D
-    concatenated_states = concatenated_states.permute(2, 0, 1, 3) # L x NUM_SAMPLES x NUM_AUG x D
-    concatenated_states = concatenated_states.squeeze()
-    return compute_function(concatenated_states, **kwargs)
-
-def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
-    L, N, D = hidden_states.shape
-
-    if N > D:
-        cov = torch.matmul(hidden_states.transpose(1, 2), hidden_states) # L x N x N
-    else:
-        cov = torch.matmul(hidden_states, hidden_states.transpose(1, 2)) # L x D x D
-
-    cov = torch.clamp(cov, min=0)
-    entropies = [itl.matrixAlphaEntropy(LAYER_COV.double(), alpha=alpha).item() for LAYER_COV in cov]
-
-    return {norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations}
-
-def compute_lidar(hidden_states, alpha=1, normalizations=['maxEntropy'], return_within_scatter=False):
-    """
-    Compute the LIDAR metric for hidden states.
-
-    Args:
-        hidden_states (torch.Tensor): The hidden states to compute LIDAR for.
-        alpha (float): The alpha parameter for entropy calculation.
-        normalizations (list): List of normalization methods to apply.
-        return_within_scatter (bool): Whether to return the within-class scatter matrix.
-
-    Returns:
-        dict: A dictionary of computed LIDAR metrics for each normalization method.
-    """
-    L, NUM_SAMPLES, NUM_AUG, D = hidden_states.shape
-
-    lda_matrices = [compute_LDA_matrix(layer.double(), return_within_class_scatter=return_within_scatter) for layer in hidden_states]
-    entropies = [itl.matrixAlphaEntropy(lda_matrix, alpha=alpha).item() for lda_matrix in lda_matrices]
-    return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in entropies] for norm in normalizations}
 
 def compute_dime(hidden_states, alpha=1, normalizations=['maxEntropy']):
     """
@@ -372,11 +219,49 @@ def compute_LDA_matrix(augmented_prompt_tensors, return_within_class_scatter=Fal
 
     return LDA_matrix
 
+def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
+    L, N, D = hidden_states.shape
 
-metric_name_to_function = {
-    'entropy': compute_entropy,
-    'lidar': compute_lidar,
-    'dime': compute_dime,
-    'infonce': compute_infonce,
-    'curvature': compute_curvature
-}
+    if N > D:
+        cov = torch.matmul(hidden_states.transpose(1, 2), hidden_states) # L x N x N
+    else:
+        cov = torch.matmul(hidden_states, hidden_states.transpose(1, 2)) # L x D x D
+
+    cov = torch.clamp(cov, min=0)
+    entropies = [itl.matrixAlphaEntropy(LAYER_COV.double(), alpha=alpha).item() for LAYER_COV in cov]
+
+    return {norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations}
+
+def compute_lidar(hidden_states, alpha=1, normalizations=['maxEntropy'], return_within_scatter=False):
+    """
+    Compute the LIDAR metric for hidden states.
+
+    Args:
+        hidden_states (torch.Tensor): The hidden states to compute LIDAR for.
+        alpha (float): The alpha parameter for entropy calculation.
+        normalizations (list): List of normalization methods to apply.
+        return_within_scatter (bool): Whether to return the within-class scatter matrix.
+
+    Returns:
+        dict: A dictionary of computed LIDAR metrics for each normalization method.
+    """
+    L, NUM_SAMPLES, NUM_AUG, D = hidden_states.shape
+
+    lda_matrices = [compute_LDA_matrix(layer.double(), return_within_class_scatter=return_within_scatter) for layer in hidden_states]
+    entropies = [itl.matrixAlphaEntropy(lda_matrix, alpha=alpha).item() for lda_matrix in lda_matrices]
+    return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in entropies] for norm in normalizations}
+
+def compute_intrinsic_dimension(hidden_states, nn=2):
+    # uses the TwoNN method to estimate intrinsic dimension    
+    # iterate over layers, skip the first layer
+
+    intrinsic_dimensions = [0]
+    normalized_intrinsic_dimensions = [0]
+    for layer_num, layer in enumerate(hidden_states[1:]):
+        layer = layer.detach().float().squeeze().cpu().numpy()
+        data = ID_DATA(layer)
+        id, id_error, id_distance = data.compute_id_2NN()
+
+        intrinsic_dimensions.append(id)
+        normalized_intrinsic_dimensions.append(id / math.log(layer.shape[0]))
+    return {'raw': intrinsic_dimensions, 'logN': normalized_intrinsic_dimensions}

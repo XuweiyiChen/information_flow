@@ -1,12 +1,17 @@
 import os
 import pickle
+from typing import Any, Callable, List, Literal, Type, Dict, Union
 
-from ..misc.metric_functions import EvaluationMetricSpecifications
+from ..metrics.metric_calling import EvaluationMetricSpecifications
 from ..model_definitions.base_automodel_wrapper import BaseModelSpecifications
 
-BASE_PATH = "large_results"
+BASE_PATH = "/home/AD/ofsk222/Research/exploration/information_plane/experiments/large_results"
 
-def construct_file_path(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+def construct_file_path(
+        model_specs: BaseModelSpecifications, 
+        evaluation_metric_specs: EvaluationMetricSpecifications, 
+        dataloader_kwargs: Dict[str, Any]
+):
     model_family = model_specs.model_family
     model_size = model_specs.model_size
     revision = model_specs.revision
@@ -19,18 +24,31 @@ def construct_file_path(model_specs: BaseModelSpecifications, evaluation_metric_
 
     return f"{BASE_PATH}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
 
-def save_results(results, model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+def save_results(
+        results, 
+        model_specs: BaseModelSpecifications, 
+        evaluation_metric_specs: EvaluationMetricSpecifications, 
+        dataloader_kwargs: Dict[str, Any]
+):
     file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "wb") as f:
         pickle.dump(results, f)
 
-def check_if_results_exist(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+def check_if_results_exist(
+        model_specs: BaseModelSpecifications, 
+        evaluation_metric_specs: EvaluationMetricSpecifications, 
+        dataloader_kwargs: Dict[str, Any]
+):
     file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
     return os.path.exists(file_path)
 
 
-def load_results(model_specs: BaseModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs):
+def load_results(
+        model_specs: BaseModelSpecifications, 
+        evaluation_metric_specs: EvaluationMetricSpecifications, 
+        dataloader_kwargs: Dict[str, Any]
+):
     file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
 
     try:

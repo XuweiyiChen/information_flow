@@ -30,6 +30,7 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from torchvision.datasets import STL10, ImageFolder
 from omegaconf import OmegaConf
+from timm.data import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD
 
 def dataset_with_index(DatasetClass: Type[Dataset]) -> Type[Dataset]:
     """Factory for datasets that also returns the data index.
@@ -264,28 +265,6 @@ def build_transform_pipeline(dataset, cfg):
     augmentations = transforms.Compose(augmentations)
     return augmentations
 
-
-def prepare_n_crop_transform(
-    transforms: List[Callable], num_crops_per_aug: List[int]
-) -> NCropAugmentation:
-    """Turns a single crop transformation to an N crops transformation.
-
-    Args:
-        transforms (List[Callable]): list of transformations.
-        num_crops_per_aug (List[int]): number of crops per pipeline.
-
-    Returns:
-        NCropAugmentation: an N crop transformation.
-    """
-
-    assert len(transforms) == len(num_crops_per_aug)
-
-    T = []
-    for transform, num_crops in zip(transforms, num_crops_per_aug):
-        T.append(NCropAugmentation(transform, num_crops))
-    return FullTransformPipeline(T)
-
-
 def prepare_datasets(
     dataset: str,
     transform: Callable,
@@ -295,6 +274,7 @@ def prepare_datasets(
     download: bool = True,
     data_fraction: float = -1.0,
     train_dataset=True,
+    number_of_samples: int = -1
 ) -> Dataset:
     """Prepares the desired dataset.
 
@@ -367,11 +347,22 @@ def prepare_datasets(
             )
             train_dataset.samples = [tuple(p) for p in zip(files, labels)]
 
+    if number_of_samples > 0:
+        train_dataset = torch.utils.data.Subset(train_dataset, range(number_of_samples))
+
     return train_dataset
 
+def multiview_collation(batch):
+    number_of_views = len(batch[0][1])
+
+    batch_indices = [x[0] for x in batch]
+    images_by_view = [torch.stack([x[1][i] for x in batch]) for i in range(number_of_views)]
+    labels = [x[2] for x in batch]
+
+    return [(batch_indices, view, labels) for view in images_by_view]
 
 def prepare_dataloader(
-    train_dataset: Dataset, batch_size: int = 64, num_workers: int = 4, shuffle: bool = True
+    train_dataset: Dataset, batch_size: int = 64, num_workers: int = 4, shuffle: bool = True, is_multiview: bool = False
 ) -> DataLoader:
     """Prepares the training dataloader for pretraining.
     Args:
@@ -389,13 +380,15 @@ def prepare_dataloader(
         num_workers=num_workers,
         pin_memory=True,
         drop_last=True,
+        collate_fn=multiview_collation if is_multiview else None
     )
+
     return train_loader
 
 
-def simclr_imagenet_transform(mean, std):
+def simclr_imagenet_transform(crop_size, mean, std, num_crops=2):
     aug_cfg = {
-        'crop_size': 224,
+        'crop_size': crop_size,
         'rrc': {
             'enabled': True,
             'crop_min_scale': 0.08,
@@ -431,53 +424,11 @@ def simclr_imagenet_transform(mean, std):
     aug_cfg = OmegaConf.create(aug_cfg)
     
     transform = build_transform_pipeline('imagenet', aug_cfg)
-    transform = NCropAugmentation(transform, num_crops=2)
+    transform = NCropAugmentation(transform, num_crops=num_crops)
     transform = FullTransformPipeline([transform])
     return transform
 
-def simclr_imagenet_transform(mean, std):
-    aug_cfg = {
-        'crop_size': 224,
-        'rrc': {
-            'enabled': True,
-            'crop_min_scale': 0.08,
-            'crop_max_scale': 1.0,
-        },
-        'color_jitter': {
-            'prob': 0.8,
-            'brightness': 0.8,
-            'contrast': 0.8,
-            'saturation': 0.8,
-            'hue': 0.2,
-        },
-        'grayscale': {
-            'prob': 0.2
-        },
-        'gaussian_blur': {
-            'prob': 0.5
-        },
-        'solarization': {
-            'prob': 0.0
-        },
-        'equalization': {
-            'prob': 0.0
-        },
-        'horizontal_flip': {
-            'prob': 0.5
-        },
-        'normalize': {
-            'mean': mean,
-            'std': std
-        }
-    }
-    aug_cfg = OmegaConf.create(aug_cfg)
-    
-    transform = build_transform_pipeline('imagenet', aug_cfg)
-    transform = NCropAugmentation(transform, num_crops=2)
-    transform = FullTransformPipeline([transform])
-    return transform
-
-def validation_imagenet_transform(mean, std):
+def validation_imagenet_transform(mean=IMAGENET_DEFAULT_MEAN, std=IMAGENET_DEFAULT_STD):
     transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),

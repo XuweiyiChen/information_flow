@@ -174,8 +174,7 @@ def get_dataloader(
     dataloader = DataLoader(tokenized_dataset, 
                             shuffle=False, 
                             num_workers=num_workers, 
-                            batch_size=batch_size,
-                            collate_fn=collate)
+                            batch_size=batch_size)
     return dataloader
 
 def get_augmentation_collated_dataloader(

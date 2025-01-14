@@ -6,13 +6,14 @@ import gc
 import tqdm
 import numpy as np
 import torch
-from transformers import AutoModel, AutoImageProcessor, AutoConfig, CLIPVisionModel, CLIPVisionConfig
+from transformers import BatchFeature, AutoModel, AutoImageProcessor, AutoConfig, CLIPVisionModel, CLIPVisionConfig
 from transformers.models import dinov2
 from torch.utils.data import DataLoader
 import timm
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from ..misc.optimal_batch_size import find_optimal_batch_size
+from .jepa.JepaEncoder import load_jepa_encoder
 
 model_name_to_sizes = {
     'sam': ['base'],
@@ -24,6 +25,7 @@ model_name_to_sizes = {
     'mae': ['base', 'large', 'huge'],
     'deit': ['base'],
     'clip': ['base', 'large'],
+    'i-jepa': ['imagenet1k', 'imagenet21k'],
 }
 model_types = list(model_name_to_sizes.keys())
 
@@ -55,6 +57,8 @@ def get_model_path(name, size):
             return "openai/clip-vit-base-patch16"
         elif size == 'large':
             return "openai/clip-vit-large-patch14"
+    elif name == 'i-jepa':
+        return ""
 
 def update_config(config, model_specs):
     if model_specs.model_family == 'mae':
@@ -89,24 +93,32 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     FUNCTIONS FOR INITIALIZATION
     """
     def setup_input_processor(self):
-        if 'timm' in self.model_path:
+        if self._is_timm_model():
            data_config = timm.data.resolve_model_data_config(self.model)
            self.image_processor = timm.data.create_transform(**data_config, is_training=False)
-
+        elif self.model_specs.model_family == 'i-jepa':
+            self.image_processor = lambda x: x
         else:
             self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
 
     def process_inputs(self, inputs):
-        if 'timm' in self.model_path:
+        if self._is_timm_model():
             return self.image_processor(inputs)
+        elif self.model_specs.model_family == 'i-jepa':
+            return inputs
         else:
-            return self.image_processor(**input, return_tensors="pt")
+            return self.image_processor(inputs, return_tensors="pt")
 
     def setup_model(self):
-        if 'timm' in self.model_path:
+        if self._is_timm_model():
             self.setup_timm_model()
+        elif self.model_specs.model_family == 'i-jepa':
+            self.setup_jepa_model()
         else:
             self.setup_huggingface_model()
+
+    def setup_jepa_model(self):
+        self.model = load_jepa_encoder(self.model_specs.model_size)
 
     def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
@@ -142,3 +154,25 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             }
         else:
             return self.forward(**kwargs)
+        
+    def prepare_inputs(self, batch):
+        batch_idx, images, labels = batch
+        batch_size = len(batch_idx)
+            
+        if isinstance(images, BatchFeature):
+            inputs = images.to("cuda")
+            inputs['pixel_values'] = inputs['pixel_values'].squeeze(1).to(self.dtype)
+        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa':
+            inputs = {
+                "x": images.to("cuda").to(self.dtype)
+            }
+        else:
+            inputs = {
+                "pixel_values": images.to("cuda").to(self.dtype)
+            }
+            inputs = {k: v.to("cuda") for k, v in inputs.items()}
+
+        return inputs
+    
+    def _is_timm_model(self):
+        return 'timm' in self.model_path

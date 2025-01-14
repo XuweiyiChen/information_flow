@@ -12,7 +12,7 @@ import mteb
 from transformers import AutoModel, AutoTokenizer
 
 from experiments.utils.model_definitions.text_automodel_wrapper import AutoModelWrapper, ModelSpecifications
-from experiments.utils.misc.metric_functions import (
+from experiments.utils.metrics.metric_functions import (
     compute_per_forward_pass,
     compute_on_concatenated_passes,
     metric_name_to_function,
@@ -63,62 +63,6 @@ def save_results(results, model_specs: ModelSpecifications, evaluation_metric_sp
     os.makedirs(results_path, exist_ok=True)
     with open(f"{results_path}/{evaluation_metric}.pkl", "wb") as f:
         pickle.dump(results, f)
-
-def calculate_and_save_layerwise_metrics(
-    model,
-    model_specs: ModelSpecifications,
-    evaluation_metric_specs: EvaluationMetricSpecifications,
-    dataloader_kwargs: Dict[str, Any],
-    base_results_path: str
-):
-    tokenizer = model.tokenizer
-
-    if evaluation_metric_specs.evaluation_metric == 'entropy':
-        dataloader = get_dataloader(tokenizer, **dataloader_kwargs)
-        compute_func_kwargs = {
-            'alpha': evaluation_metric_specs.alpha,
-            'normalizations': evaluation_metric_specs.normalizations
-        }
-        forward_pass_func = compute_per_forward_pass if evaluation_metric_specs.granularity == 'sentence' else compute_on_concatenated_passes
-  
-
-    elif evaluation_metric_specs.evaluation_metric == 'curvature':
-        dataloader = get_dataloader(tokenizer, **dataloader_kwargs)
-        compute_func_kwargs = {
-            'k': evaluation_metric_specs.curvature_k
-        }
-        forward_pass_func = compute_per_forward_pass
-
-    elif evaluation_metric_specs.evaluation_metric == 'lidar':
-        dataloader_kwargs['num_augmentations_per_sample'] = 16
-        dataloader = get_augmentation_collated_dataloader(tokenizer, **dataloader_kwargs)
-        compute_func_kwargs = {
-            'alpha': evaluation_metric_specs.alpha,
-            'normalizations': evaluation_metric_specs.normalizations,
-        }
-        forward_pass_func = compute_on_concatenated_passes
-
-    elif evaluation_metric_specs.evaluation_metric == 'dime':
-        dataloader_kwargs['num_augmentations_per_sample'] = 2
-        dataloader = get_augmentation_collated_dataloader(tokenizer, **dataloader_kwargs)
-        compute_func_kwargs = {
-            'alpha': evaluation_metric_specs.alpha,
-            'normalizations': evaluation_metric_specs.normalizations,
-        }
-        forward_pass_func = compute_on_concatenated_passes
-
-    elif evaluation_metric_specs.evaluation_metric == 'infonce':
-        dataloader_kwargs['num_augmentations_per_sample'] = 2
-        dataloader = get_augmentation_collated_dataloader(tokenizer, **dataloader_kwargs)
-        compute_func_kwargs = {
-            'temperature': 0.1,
-        }
-        forward_pass_func = compute_on_concatenated_passes
-
-    compute_func = metric_name_to_function[evaluation_metric_specs.evaluation_metric]
-    results = forward_pass_func(model, dataloader, compute_func, **compute_func_kwargs)
-    save_results(results, model_specs, evaluation_metric_specs, dataloader_kwargs, base_results_path)
-
 
 def run_entropy_metrics(model, model_specs: ModelSpecifications, MTEB_evaluator: mteb.MTEB, args):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]

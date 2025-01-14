@@ -3,7 +3,7 @@ from typing import Any, Callable, List, Literal, Type, Dict, Union
 import tqdm
 import numpy as np
 import torch
-from transformers import AutoModel, AutoTokenizer, AutoConfig
+from transformers import AutoModel, AutoTokenizer, AutoConfig, AutoModelForCausalLM
 from torch.utils.data import DataLoader
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
@@ -148,7 +148,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             else:
                 raise ValueError(f"Model family {self.model_specs.model_family} not found")
         else:
-            MODEL_CLASS = AutoModel
+            MODEL_CLASS = AutoModelForCausalLM
 
         self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
 
@@ -205,7 +205,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
 
         for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable= not verbose):
             batch = {k: v.to(self._get_first_layer_device()) for k, v in batch.items()}
-                
+            
             outputs = self.forward(**batch)
             hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
             hidden_states = self._get_pooled_hidden_states(hidden_states, batch["attention_mask"], method="mean")
@@ -234,3 +234,12 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return hidden_states[:, -1]
         else:
             raise ValueError(f"Invalid pooling method: {method}")
+        
+    def prepare_inputs(self, batch):
+        batch = {k: v.to(self.device) for k, v in batch.items()}
+
+        # squeeze if needed
+        if len(batch['input_ids'].shape) == 3:
+            batch = {k: v.squeeze() for k, v in batch.items()}
+
+        return batch
