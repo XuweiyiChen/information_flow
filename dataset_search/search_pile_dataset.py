@@ -101,6 +101,7 @@ def search_dataset(queries):
                 query_idx_to_best_result[idx] = query_result
 
     return query_idx_to_best_result
+
 def medical_tokenize_function(examples):
     medical_prompt = """You are an AI Medical Assistant Chatbot, trained to answer medical questions. Below is an instruction that describes a task, paired with an response context. Write a response that appropriately completes the request.
 
