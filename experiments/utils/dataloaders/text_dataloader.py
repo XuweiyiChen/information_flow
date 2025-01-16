@@ -174,7 +174,8 @@ def get_dataloader(
     dataloader = DataLoader(tokenized_dataset, 
                             shuffle=False, 
                             num_workers=num_workers, 
-                            batch_size=batch_size)
+                            batch_size=batch_size,
+                            collate_fn=collate)
     return dataloader
 
 def get_augmentation_collated_dataloader(
@@ -291,15 +292,15 @@ def reduce_and_visualize_hidden_states(hidden_states, reduction="tsne", labels=N
 
 def text_augmentation(texts, num_augmentations_per_sample=1):
     # input is list of strings
+
     import nlpaug.augmenter.char as nac
     import nlpaug.augmenter.word as naw
     import nlpaug.augmenter.sentence as nas
     import nlpaug.flow as naf
 
     aug = naf.Sequential([
-        naw.SplitAug(),
-        nac.RandomCharAug(),
-        nac.KeyboardAug()
+        naw.SplitAug(aug_p=0.01, aug_min=1, aug_max=2),
+        nac.KeyboardAug(aug_word_p=0.05, aug_word_min=1, aug_word_max=2, aug_char_max=2)
     ])
 
     augmented_text = [str(aug.augment(x, n=num_augmentations_per_sample)) for x in texts]

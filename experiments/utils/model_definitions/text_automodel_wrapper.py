@@ -122,6 +122,9 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         self.tokenizer.padding_side = "left"
         assert self.tokenizer.pad_token is not None
 
+        # number of tokens the model can handle
+        self.max_tokens = self.tokenizer.model_max_length
+
     def setup_model(self):
         self.config = AutoConfig.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
@@ -150,7 +153,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         else:
             MODEL_CLASS = AutoModelForCausalLM
 
-        self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
+        self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()        
 
     """
     FUNCTIONS FOR INFERENCE
@@ -236,10 +239,15 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             raise ValueError(f"Invalid pooling method: {method}")
         
     def prepare_inputs(self, batch):
+        # move to device
         batch = {k: v.to(self.device) for k, v in batch.items()}
 
         # squeeze if needed
         if len(batch['input_ids'].shape) == 3:
             batch = {k: v.squeeze() for k, v in batch.items()}
+
+        # unsqueeze if needed, such as for augmentation dataloaders
+        if len(batch['input_ids'].shape) == 1:
+            batch = {k: v.unsqueeze(0) for k, v in batch.items()}
 
         return batch

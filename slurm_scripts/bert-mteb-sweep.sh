@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 USE_SLURM=0
 
 MODEL_NAME="bert"

@@ -62,7 +62,7 @@ class EvaluationMetricSpecifications:
     def __str__(self):
         return f"Metric: {self.evaluation_metric}"
 
-def compute_per_forward_pass(model, dataloader, compute_function, should_average_over_layers=True, **kwargs):
+def compute_per_forward_pass(model, dataloader, num_examples,compute_function, should_average_over_layers=False, **kwargs):
     """
     Compute a metric for each forward pass through the model.
 
@@ -77,7 +77,7 @@ def compute_per_forward_pass(model, dataloader, compute_function, should_average
     """
     results = {}
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM, desc="Processing batches"):
+        for batch in tqdm.tqdm(dataloader, total=num_examples, disable=DISABLE_TQDM, desc="Processing batches"):
             batch = model.prepare_inputs(batch)
             outputs = model(**batch)
             
@@ -113,13 +113,14 @@ def compute_per_forward_pass(model, dataloader, compute_function, should_average
     else:
         return {norm: np.array(values) for norm, values in results.items()}
 
-def compute_on_concatenated_passes(model, dataloader, compute_function, **kwargs):
+def compute_on_concatenated_passes(model, dataloader, num_examples, compute_function, **kwargs):
     """
     Compute a metric on concatenated hidden states from multiple forward passes.
 
     Args:
         model (torch.nn.Module): The model to use for forward passes.
         dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
+        num_examples (int): The number of examples in the dataloader, can be tough to get directly from the dataloader in some cases. Only used for tqdm.
         compute_function (callable): The function to compute the metric.
         **kwargs: Additional keyword arguments to pass to compute_function.
 
@@ -127,19 +128,26 @@ def compute_on_concatenated_passes(model, dataloader, compute_function, **kwargs
         dict: A dictionary of computed metrics.
     """
     all_hidden_states = []
+
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM):
+        for batch in tqdm.tqdm(dataloader, total=num_examples, disable=DISABLE_TQDM):
             if not isinstance(batch, tuple) and not isinstance(batch, list):
                 batch = (batch,)
             
             batch_hidden_states = []
             for sub_batch in batch:
                 sub_batch = model.prepare_inputs(sub_batch)
-
+               
                 outputs = model(**sub_batch)
                 hidden_states = [mf.normalize(x.squeeze()) for x in outputs.hidden_states] # L x BS x NUM_TOKENS x D
-                layer_means = torch.stack([x[:, 0, :] for x in hidden_states]) # L x BS x D, get CLS token
-                #layer_means = torch.stack([torch.mean(x, dim=1) for x in hidden_states]) # L x BS x D
+                
+                # uncomment for CLS token
+                #layer_means = torch.stack([x[:, 0, :] for x in hidden_states]) # L x BS x D
+                
+                layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states]) # L x BS x D
+                if len(layer_means.shape) == 2:
+                    layer_means = layer_means.unsqueeze(1) # L x BS x D
+
                 batch_hidden_states.append(layer_means)
             
             all_hidden_states.append(torch.stack(batch_hidden_states)) # NUM_AUG x L x BS x D
@@ -202,9 +210,9 @@ def calculate_and_save_layerwise_metrics(
         forward_pass_func = compute_per_forward_pass
 
     compute_func = metric_name_to_function[evaluation_metric_specs.evaluation_metric]
-    results = forward_pass_func(model, dataloader, compute_func, **compute_func_kwargs)
+    results = forward_pass_func(model, dataloader, dataloader_kwargs['num_samples'], compute_func, **compute_func_kwargs)
 
-    from utils.misc.results_saving import save_results
+    from utils.misc.results_saving import save_results # here to avoid circular imports
     save_results(results, model_specs, evaluation_metric_specs, dataloader_kwargs)
 
     return results

@@ -12,7 +12,7 @@ def construct_file_path(
         model_specs: BaseModelSpecifications, 
         evaluation_metric_specs: EvaluationMetricSpecifications, 
         dataloader_kwargs: Dict[str, Any],
-        base_path: str = "experiments/large_results",
+        base_path: str = "experiments/results",
 ):
     model_family = model_specs.model_family
     model_size = model_specs.model_size
@@ -73,13 +73,13 @@ def load_results_for_model_and_revisions(model_family, model_size, revisions, ev
 
 def load_all_results(
         should_normalize_scores_across_models: bool = False,
-        base_path: str = 'experiments/large_results'
+        base_path: str = 'experiments/results'
 ):
     """
     This is ugly code but it works. Basically it expects the folder structure to be as follows:
 
 
-    experiments/large_results/
+    experiments/results/
         model_family/
             model_size/
                 revision/

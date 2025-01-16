@@ -83,6 +83,10 @@ class BaseLayerwiseAutoModelWrapper:
             return self.model.hf_device_map
         elif hasattr(self.model, 'model') and hasattr(self.model.model, 'hf_device_map'):
             return self.model.model.hf_device_map
+        elif self.model_specs.model_family == 'bert' and hasattr(self.model, 'device'):
+            # BERT needs special handling because the device map is not supported
+            # https://github.com/huggingface/transformers/issues/25296
+            return {'device': self.model.device}
         else:
             raise ValueError("Could not find hf_device_map")
     

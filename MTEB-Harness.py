@@ -7,6 +7,8 @@ import mteb
 from experiments.utils.model_definitions.text_automodel_wrapper import TextModelSpecifications, TextLayerwiseAutoModelWrapper
 from experiments.utils.metrics.metric_calling import EvaluationMetricSpecifications, calculate_and_save_layerwise_metrics
 from experiments.utils.misc.results_saving import construct_file_path
+from experiments.utils.misc.optimal_batch_size import find_optimal_batch_size
+from experiments.utils.dataloaders.text_dataloader import get_dataloader, get_augmentation_collated_dataloader
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -21,14 +23,18 @@ def parse_args():
 
 
 def run_entropy_metrics(
-        model,
+        model: TextLayerwiseAutoModelWrapper,
         model_specs: TextModelSpecifications, 
         MTEB_evaluator: mteb.MTEB,
         args
 ):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
-    metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'dataset-entropy']
+    metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'curvature']
     splits = ['train', 'test']
+
+    # get maximum batch size for the model
+    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=model.max_tokens)
+    print(f"Optimal batch size: {optimal_batch_size}")
 
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
         print(f"Running evaluation for {task_dataset} - {metric} - {split}")
@@ -37,19 +43,37 @@ def run_entropy_metrics(
         dataloader_kwargs = {
             'dataset_name': task_dataset,
             'split': split,
-            'num_samples': 10000
+            'num_samples': 10000,
+            'batch_size': optimal_batch_size
         }
-
+        
         # Check if results already exist, skip if they do
         results_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs, args.base_results_path)
         if os.path.exists(results_path):
             print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
             continue
-        
+
+
+        # Get the dataloader. Depending on the metric, might need augmentations
+        if metric in ['sentence-entropy', 'dataset-entropy', 'curvature']:
+            dataloader = get_dataloader(model.tokenizer, **dataloader_kwargs)
+        elif metric in ['dime', 'infonce']:
+            dataloader_kwargs['num_augmentations_per_sample'] = 2
+            dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
+        elif metric == 'lidar':
+            dataloader_kwargs['num_augmentations_per_sample'] = 16
+            dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
+        else:
+            raise ValueError(f"dataloader for metric {metric} is not implemented yet")
+
+
+        # compute the metrics for the dataloader
         try:
-            calculate_and_save_layerwise_metrics(model, model_specs, evaluation_metric_specs, dataloader_kwargs, args.base_results_path)
+            calculate_and_save_layerwise_metrics(model, dataloader, model_specs, evaluation_metric_specs, dataloader_kwargs)
         except Exception as e:
             print(f"Error running evaluation for {task_dataset} - {metric} - {split}: {str(e)}")
+            if args.raise_error:
+                raise e
 
 def main():
     args = parse_args()
@@ -69,6 +93,11 @@ def main():
     
     device_map = "auto" if model_family != 'bert' else None
     model = TextLayerwiseAutoModelWrapper(model_specs, device_map=device_map, evaluation_layer_idx=evaluation_layer)
+
+    # if BERT, we need to manually move the model to the device because the device map is not supported
+    # https://github.com/huggingface/transformers/issues/25296
+    if model_family == 'bert':
+        model.model = model.model.to("cuda:0")
 
     if args.purpose == 'run_tasks': 
         results_output_folder = f'{args.base_results_path}/{model_family}/{model_size}/{revision}/mteb/layer_{model.evaluation_layer_idx}'
