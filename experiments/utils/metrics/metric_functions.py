@@ -56,6 +56,7 @@ def normalize(R):
 def compute_dime(hidden_states, alpha=1, normalizations=['maxEntropy']):
     """
     Compute the DIME metric for hidden states.
+        https://arxiv.org/abs/2301.08164
 
     Args:
         hidden_states (torch.Tensor): The hidden states to compute DIME for.
@@ -75,7 +76,7 @@ def compute_dime(hidden_states, alpha=1, normalizations=['maxEntropy']):
         cov = torch.matmul(hidden_states, hidden_states.transpose(-1, -2))
 
     augmentation_A_covs = [cov[0].double() for cov in cov]
-    augmentation_B_covs = [cov[1].double() for cov in cov]  
+    augmentation_B_covs = [cov[1].double() for cov in cov]
     
     dimes = [
         dent.doe(augmentation_A_covs[idx].double(), augmentation_B_covs[idx].double(), alpha=alpha, n_iters=10).item() 
@@ -89,6 +90,7 @@ def compute_infonce(hidden_states, temperature=0.1):
 
     Args:
         hidden_states (torch.Tensor): The hidden states to compute InfoNCE for.
+        temperature (float): The temperature parameter for InfoNCE calculation.
 
     Returns:
         dict: A dictionary of computed InfoNCE metrics for each normalization method.
@@ -175,9 +177,37 @@ def compute_curvature(hidden_states, k=1):
         'logD': [x / math.log(D) for x in curvatures] 
     }
 
+
+
+def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
+    """
+    Compute the prompt entropy of the hidden states.
+
+    Args:
+        hidden_states (torch.Tensor): The hidden states to compute entropy for.
+        alpha (float): The alpha parameter for entropy calculation.
+        normalizations (list): List of normalization methods to apply.
+
+    Returns:
+        dict: A dictionary of computed entropy metrics for each normalization method.
+    """
+    L, N, D = hidden_states.shape
+
+    if N > D:
+        cov = torch.matmul(hidden_states.transpose(1, 2), hidden_states) # L x N x N
+    else:
+        cov = torch.matmul(hidden_states, hidden_states.transpose(1, 2)) # L x D x D
+
+    cov = torch.clamp(cov, min=0)
+    entropies = [itl.matrixAlphaEntropy(LAYER_COV.double(), alpha=alpha).item() for LAYER_COV in cov]
+
+    return {norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations}
+
+
 def compute_LDA_matrix(augmented_prompt_tensors, return_within_class_scatter=False):
     """
     Compute the LDA matrix as defined in the LIDAR paper.
+        https://arxiv.org/abs/2312.04000
 
     Args:
         augmented_prompt_tensors (torch.Tensor): Tensor of augmented prompts.
@@ -219,22 +249,10 @@ def compute_LDA_matrix(augmented_prompt_tensors, return_within_class_scatter=Fal
 
     return LDA_matrix
 
-def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
-    L, N, D = hidden_states.shape
-
-    if N > D:
-        cov = torch.matmul(hidden_states.transpose(1, 2), hidden_states) # L x N x N
-    else:
-        cov = torch.matmul(hidden_states, hidden_states.transpose(1, 2)) # L x D x D
-
-    cov = torch.clamp(cov, min=0)
-    entropies = [itl.matrixAlphaEntropy(LAYER_COV.double(), alpha=alpha).item() for LAYER_COV in cov]
-
-    return {norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations}
-
 def compute_lidar(hidden_states, alpha=1, normalizations=['maxEntropy'], return_within_scatter=False):
     """
     Compute the LIDAR metric for hidden states.
+        https://arxiv.org/abs/2312.04000
 
     Args:
         hidden_states (torch.Tensor): The hidden states to compute LIDAR for.
@@ -251,6 +269,11 @@ def compute_lidar(hidden_states, alpha=1, normalizations=['maxEntropy'], return_
     entropies = [itl.matrixAlphaEntropy(lda_matrix, alpha=alpha).item() for lda_matrix in lda_matrices]
     return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in entropies] for norm in normalizations}
 
+
+
+"""
+Implementation of intrinsic dimension metric using the TwoNN estimor
+"""
 def compute_intrinsic_dimension(hidden_states, nn=2):
     # uses the TwoNN method to estimate intrinsic dimension    
     # iterate over layers, skip the first layer
