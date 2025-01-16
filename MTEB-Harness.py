@@ -48,7 +48,13 @@ def run_entropy_metrics(
         }
         
         # Check if results already exist, skip if they do
-        results_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs, args.base_results_path)
+        results_path = construct_file_path(
+            model_specs, 
+            evaluation_metric_specs, 
+            dataloader_kwargs, 
+            args.base_results_path, 
+            include_split=True
+        )
         if os.path.exists(results_path):
             print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
             continue

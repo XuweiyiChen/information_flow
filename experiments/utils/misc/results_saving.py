@@ -13,6 +13,7 @@ def construct_file_path(
         evaluation_metric_specs: EvaluationMetricSpecifications, 
         dataloader_kwargs: Dict[str, Any],
         base_path: str = "experiments/results",
+        include_split: bool = False
 ):
     model_family = model_specs.model_family
     model_size = model_specs.model_size
@@ -24,7 +25,11 @@ def construct_file_path(
     if evaluation_metric == 'entropy':
         evaluation_metric = f"{evaluation_metric}_{granularity}"
 
-    return f"{base_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
+    if include_split:
+        split = dataloader_kwargs['split']
+        return f"{base_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{split}/{evaluation_metric}.pkl"
+    else:
+        return f"{base_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
 
 def save_results(
         results, 
@@ -32,7 +37,7 @@ def save_results(
         evaluation_metric_specs: EvaluationMetricSpecifications, 
         dataloader_kwargs: Dict[str, Any]
 ):
-    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
+    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs, include_split=True)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "wb") as f:
         pickle.dump(results, f)

@@ -212,7 +212,7 @@ def calculate_and_save_layerwise_metrics(
     compute_func = metric_name_to_function[evaluation_metric_specs.evaluation_metric]
     results = forward_pass_func(model, dataloader, dataloader_kwargs['num_samples'], compute_func, **compute_func_kwargs)
 
-    from utils.misc.results_saving import save_results # here to avoid circular imports
+    from ..misc.results_saving import save_results # here to avoid circular imports
     save_results(results, model_specs, evaluation_metric_specs, dataloader_kwargs)
 
     return results
