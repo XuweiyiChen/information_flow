@@ -8,5 +8,9 @@ PURPOSE="run_entropy_metrics"
 
 for size in ${MODEL_SIZES[@]}; do
     echo "Running evaluation for $MODEL_NAME $size layer $layer"
-    python experiments/mteb-harness.py --model_family $MODEL_NAME --model_size $size --revision $REVISION --base_results_path "experiments/results" --purpose run_entropy_metrics
+    python MTEB-Harness.py \
+        --model_family $MODEL_NAME \
+        --model_size $size \
+        --revision $REVISION \
+        --purpose run_entropy_metrics
 done

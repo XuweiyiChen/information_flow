@@ -79,6 +79,6 @@ mkdir -p "$log_dir"
 output_file="${log_dir}/logs.out"
 error_file="${log_dir}/logs.err"
 
-SCRIPT="/home/ofsk222/projects/information_flow/experiments/mteb-harness.py"
-FULL_SCRIPT="python3 -u $SCRIPT --model_family $model_family --model_size $model_size --revision $revision --evaluation_layer $layer --base_results_path experiments/results --purpose $purpose"
+SCRIPT="/home/ofsk222/projects/information_flow/MTEB-Harness.py"
+FULL_SCRIPT="python3 -u $SCRIPT --model_family $model_family --model_size $model_size --revision $revision --evaluation_layer $layer --base_results_path experiments/large_results --purpose $purpose"
 srun --output="$output_file" --error="$error_file" singularity run --app pytorch222 --nv $CONTAINER $FULL_SCRIPT

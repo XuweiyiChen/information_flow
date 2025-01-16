@@ -14,12 +14,11 @@ for size in ${MODEL_SIZES[@]}; do
             --evaluation_layer -1 \
             --purpose $PURPOSE
     else
-        python experiments/mteb-harness.py \
+        python MTEB-Harness.py \
             --model_family $MODEL_NAME \
             --model_size $size \
             --revision $REVISION \
             --evaluation_layer -1 \
-            --base_results_path "experiments/results" \
             --purpose $PURPOSE
     fi
 done

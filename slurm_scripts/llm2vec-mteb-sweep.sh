@@ -13,12 +13,11 @@ for size in ${MODEL_SIZES[@]}; do
             JOBNAME="llm2vec-$layer"
             sbatch -J $JOBNAME slurm_submit.sh --model_family $MODEL_NAME --model_size $size --revision $REVISION --evaluation_layer $layer --purpose run_tasks
         else
-            python experiments/mteb-harness.py \
+            python MTEB-Harness.py \
                 --model_family $MODEL_NAME \
                 --model_size $size \
                 --revision $REVISION \
                 --evaluation_layer $layer \
-                --base_results_path "experiments/results" \
                 --purpose run_tasks
         fi
     done

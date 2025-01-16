@@ -1,5 +1,5 @@
 #!/bin/bash
-USE_SLURM=1
+USE_SLURM=0
 
 MODEL_NAME="bert"
 MODEL_SIZES=('base' 'large')
@@ -12,7 +12,7 @@ for size in ${MODEL_SIZES[@]}; do
             sbatch slurm_submit.sh $MODEL_NAME $size $REVISION $layer
         else
             echo "Running evaluation for $MODEL_NAME $size layer $layer"
-            python experiments/mteb-harness.py --model_family $MODEL_NAME --model_size $size --revision $REVISION --evaluation_layer $layer
+            python MTEB-Harness.py --model_family $MODEL_NAME --model_size $size --revision $REVISION --evaluation_layer $layer
         fi
     done
 done
