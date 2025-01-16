@@ -8,12 +8,11 @@ import numpy as np
 from ..metrics.metric_calling import EvaluationMetricSpecifications
 from ..model_definitions.base_automodel_wrapper import BaseModelSpecifications
 
-BASE_PATH = "/home/AD/ofsk222/Research/exploration/information_plane/experiments/large_results"
-
 def construct_file_path(
         model_specs: BaseModelSpecifications, 
         evaluation_metric_specs: EvaluationMetricSpecifications, 
-        dataloader_kwargs: Dict[str, Any]
+        dataloader_kwargs: Dict[str, Any],
+        base_path: str = "experiments/large_results",
 ):
     model_family = model_specs.model_family
     model_size = model_specs.model_size
@@ -25,7 +24,7 @@ def construct_file_path(
     if evaluation_metric == 'entropy':
         evaluation_metric = f"{evaluation_metric}_{granularity}"
 
-    return f"{BASE_PATH}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
+    return f"{base_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{evaluation_metric}.pkl"
 
 def save_results(
         results, 
@@ -72,7 +71,10 @@ def load_results_for_model_and_revisions(model_family, model_size, revisions, ev
             results[(revision, evaluation_metric)] = load_results(model_specs, evaluation_metric_specs, dataloader_kwargs)
     return results
 
-def load_all_results(should_normalize_scores_across_models: bool = False):
+def load_all_results(
+        should_normalize_scores_across_models: bool = False,
+        base_path: str = 'experiments/large_results'
+):
     """
     This is ugly code but it works. Basically it expects the folder structure to be as follows:
 
@@ -94,7 +96,7 @@ def load_all_results(should_normalize_scores_across_models: bool = False):
         should_normalize_scores_across_models: If True, normalize scores to have the same mean and std at the model-revision-layer level.
     """
     all_results = {}
-    results_dir = BASE_PATH
+    results_dir = base_path
 
 
     # for each task, find the corresponding dataset name  

@@ -1,29 +1,12 @@
-import logging
-from typing import Any, Callable, List, Literal, Type, Dict, Union
-from pathlib import Path
 import argparse
 import os
-import pickle
 from itertools import product
-
-import numpy as np
-import torch
+from pathlib import Path
 import mteb
-from transformers import AutoModel, AutoTokenizer
 
-from experiments.utils.model_definitions.text_automodel_wrapper import AutoModelWrapper, ModelSpecifications
-from experiments.utils.metrics.metric_functions import (
-    compute_per_forward_pass,
-    compute_on_concatenated_passes,
-    metric_name_to_function,
-    EvaluationMetricSpecifications
-)
-from experiments.utils.misc.text_dataloader import (
-    model_name_to_sizes, 
-    get_model_path, 
-    get_dataloader, 
-    get_augmentation_collated_dataloader
-)
+from experiments.utils.model_definitions.text_automodel_wrapper import TextModelSpecifications, TextLayerwiseAutoModelWrapper
+from experiments.utils.metrics.metric_calling import EvaluationMetricSpecifications, calculate_and_save_layerwise_metrics
+from experiments.utils.misc.results_saving import construct_file_path
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -37,38 +20,16 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_results_path(model_specs: ModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs, base_results_path, include_file_name=True):
-    model_family = model_specs.model_family
-    model_size = model_specs.model_size
-    revision = model_specs.revision
-    evaluation_metric = evaluation_metric_specs.evaluation_metric
-    granularity = evaluation_metric_specs.granularity
-    dataset = dataloader_kwargs['dataset_name']
-    split = dataloader_kwargs['split']
-
-    if evaluation_metric == 'entropy':
-        evaluation_metric = f"{evaluation_metric}_{granularity}"
-
-    if include_file_name:
-        return f"{base_results_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{split}/{evaluation_metric}.pkl"
-    else:
-        return f"{base_results_path}/{model_family}/{model_size}/{revision}/metrics/{dataset}/{split}"
-
-def save_results(results, model_specs: ModelSpecifications, evaluation_metric_specs: EvaluationMetricSpecifications, dataloader_kwargs, base_results_path):
-    results_path = get_results_path(model_specs, evaluation_metric_specs, dataloader_kwargs, base_results_path, include_file_name=False)
-    evaluation_metric = evaluation_metric_specs.evaluation_metric
-    if evaluation_metric == 'entropy':
-        evaluation_metric = f"{evaluation_metric}_{evaluation_metric_specs.granularity}"
-
-    os.makedirs(results_path, exist_ok=True)
-    with open(f"{results_path}/{evaluation_metric}.pkl", "wb") as f:
-        pickle.dump(results, f)
-
-def run_entropy_metrics(model, model_specs: ModelSpecifications, MTEB_evaluator: mteb.MTEB, args):
+def run_entropy_metrics(
+        model,
+        model_specs: TextModelSpecifications, 
+        MTEB_evaluator: mteb.MTEB,
+        args
+):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
-    #metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'dataset-entropy']
-    metrics = ['sentence-entropy']
+    metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'dataset-entropy']
     splits = ['train', 'test']
+
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
         print(f"Running evaluation for {task_dataset} - {metric} - {split}")
         evaluation_metric_specs = EvaluationMetricSpecifications(evaluation_metric=metric)
@@ -79,8 +40,8 @@ def run_entropy_metrics(model, model_specs: ModelSpecifications, MTEB_evaluator:
             'num_samples': 10000
         }
 
-        # Check if results already exist
-        results_path = get_results_path(model_specs, evaluation_metric_specs, dataloader_kwargs, args.base_results_path, include_file_name=True)
+        # Check if results already exist, skip if they do
+        results_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs, args.base_results_path)
         if os.path.exists(results_path):
             print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
             continue
@@ -98,7 +59,7 @@ def main():
     evaluation_layer = args.evaluation_layer
 
     print(f"Running evaluation for {model_family} {model_size} {revision} layer {evaluation_layer}")
-    model_specs = ModelSpecifications(model_family, model_size, revision=revision)
+    model_specs = TextModelSpecifications(model_family, model_size, revision=revision)
 
     # handle tasks
     mteb_eng = mteb.get_benchmark("MTEB(eng)")
@@ -107,7 +68,7 @@ def main():
     evaluator = mteb.MTEB(tasks=reduced_mteb_eng_tasks)
     
     device_map = "auto" if model_family != 'bert' else None
-    model = AutoModelWrapper(model_specs, device_map=device_map, evaluation_layer_idx=evaluation_layer)
+    model = TextLayerwiseAutoModelWrapper(model_specs, device_map=device_map, evaluation_layer_idx=evaluation_layer)
 
     if args.purpose == 'run_tasks': 
         results_output_folder = f'{args.base_results_path}/{model_family}/{model_size}/{revision}/mteb/layer_{model.evaluation_layer_idx}'
