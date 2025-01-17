@@ -27,8 +27,8 @@ def find_optimal_batch_size(model, number_of_samples, device, batch_size=512, ma
         garbage_collect_cuda()
         try:
             worst_case_batch = {
-                "input_ids": torch.randint(0, 1, (batch_size, max_sentence_length)).to(device),
-                "attention_mask": torch.ones((batch_size, max_sentence_length)).to(device)
+                "input_ids": torch.ones((batch_size, max_sentence_length), dtype=torch.int).to(device),
+                "attention_mask": torch.ones((batch_size, max_sentence_length), dtype=torch.int).to(device)
             }
             model(**worst_case_batch)
             had_success = True

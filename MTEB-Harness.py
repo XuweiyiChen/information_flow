@@ -32,8 +32,13 @@ def run_entropy_metrics(
     metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'curvature']
     splits = ['train', 'test']
 
+    if model_specs.model_family == 'bert':
+        max_sample_length = 512
+    else:
+        max_sample_length = 2048
+
     # get maximum batch size for the model
-    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=model.max_tokens)
+    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=max_sample_length)
     print(f"Optimal batch size: {optimal_batch_size}")
 
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
@@ -44,9 +49,10 @@ def run_entropy_metrics(
             'dataset_name': task_dataset,
             'split': split,
             'num_samples': 10000,
-            'batch_size': optimal_batch_size
+            'batch_size': optimal_batch_size,
+            'max_sample_length': max_sample_length
         }
-        
+
         # Check if results already exist, skip if they do
         results_path = construct_file_path(
             model_specs, 
