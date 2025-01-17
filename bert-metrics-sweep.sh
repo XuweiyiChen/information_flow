@@ -14,6 +14,5 @@ for size in ${MODEL_SIZES[@]}; do
         --model_size $size \
         --revision $REVISION \
         --purpose run_entropy_metrics \
-        --raise_error True \
 
 done
