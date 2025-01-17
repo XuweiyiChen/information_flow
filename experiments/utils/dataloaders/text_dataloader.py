@@ -141,7 +141,7 @@ def get_dataloader(
 
     elif 'mteb' in dataset_name:
         try:
-            dataset = load_dataset(dataset_name)[split]
+            dataset = load_dataset(dataset_name, trust_remote_code=True)[split]
         except KeyError as e:
             print(f"Failed to load dataset {dataset_name} with split {split} with error {e}")
             raise e
