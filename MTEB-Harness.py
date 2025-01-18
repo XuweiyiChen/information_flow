@@ -10,6 +10,9 @@ from experiments.utils.misc.results_saving import construct_file_path
 from experiments.utils.misc.optimal_batch_size import find_optimal_batch_size
 from experiments.utils.dataloaders.text_dataloader import get_dataloader, get_augmentation_collated_dataloader
 
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_family', type=str, default='Pythia')
