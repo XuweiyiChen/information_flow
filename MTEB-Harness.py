@@ -42,47 +42,50 @@ def run_entropy_metrics(
     print(f"Optimal batch size: {optimal_batch_size}")
 
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
-        print(f"Running evaluation for {task_dataset} - {metric} - {split}")
-        evaluation_metric_specs = EvaluationMetricSpecifications(evaluation_metric=metric)
-
-        dataloader_kwargs = {
-            'dataset_name': task_dataset,
-            'split': split,
-            'num_samples': 10000,
-            'batch_size': optimal_batch_size,
-            'max_sample_length': max_sample_length
-        }
-
-        # Check if results already exist, skip if they do
-        results_path = construct_file_path(
-            model_specs, 
-            evaluation_metric_specs, 
-            dataloader_kwargs, 
-            args.base_results_path, 
-            include_split=True
-        )
-        if os.path.exists(results_path):
-            print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
-            continue
-
-
-        # Get the dataloader. Depending on the metric, might need augmentations
-        if metric in ['sentence-entropy', 'dataset-entropy', 'curvature']:
-            dataloader = get_dataloader(model.tokenizer, **dataloader_kwargs)
-        elif metric in ['dime', 'infonce']:
-            dataloader_kwargs['num_augmentations_per_sample'] = 2
-            dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
-        elif metric == 'lidar':
-            dataloader_kwargs['num_augmentations_per_sample'] = 16
-            dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
-        else:
-            raise ValueError(f"dataloader for metric {metric} is not implemented yet")
-
-
-        # compute the metrics for the dataloader
         try:
+            print(f"Running evaluation for {task_dataset} - {metric} - {split}")
+            evaluation_metric_specs = EvaluationMetricSpecifications(evaluation_metric=metric)
+
+            dataloader_kwargs = {
+                'dataset_name': task_dataset,
+                'split': split,
+                'num_samples': 10000,
+                'batch_size': optimal_batch_size,
+                'max_sample_length': max_sample_length
+            }
+
+            # Check if results already exist, skip if they do
+            results_path = construct_file_path(
+                model_specs, 
+                evaluation_metric_specs, 
+                dataloader_kwargs, 
+                args.base_results_path, 
+                include_split=True
+            )
+            if os.path.exists(results_path):
+                print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
+                continue
+
+            # Get the dataloader. Depending on the metric, might need augmentations
+            if metric in ['sentence-entropy', 'dataset-entropy', 'curvature']:
+                dataloader = get_dataloader(model.tokenizer, **dataloader_kwargs)
+            elif metric in ['dime', 'infonce']:
+                dataloader_kwargs['num_augmentations_per_sample'] = 2
+                dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
+            elif metric == 'lidar':
+                dataloader_kwargs['num_augmentations_per_sample'] = 16
+                dataloader = get_augmentation_collated_dataloader(model.tokenizer, **dataloader_kwargs)
+            else:
+                raise ValueError(f"dataloader for metric {metric} is not implemented yet")
+
+            # compute the metrics for the dataloader
             calculate_and_save_layerwise_metrics(model, dataloader, model_specs, evaluation_metric_specs, dataloader_kwargs)
+    
         except Exception as e:
+            if 'SplitDoesNotExist' in str(e):
+                print(f"The dataset {task_dataset} does not have split {split}. Skipping {metric} computation for this dataset/split...")
+                continue
+
             print(f"Error running evaluation for {task_dataset} - {metric} - {split}: {str(e)}")
             if args.raise_error:
                 raise e
