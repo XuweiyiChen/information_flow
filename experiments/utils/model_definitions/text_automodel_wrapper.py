@@ -5,11 +5,11 @@ import numpy as np
 import torch
 from transformers import AutoModel, AutoTokenizer, AutoConfig, AutoModelForCausalLM
 from torch.utils.data import DataLoader
+from llm2vec import LLM2Vec
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from ..misc.optimal_batch_size import find_optimal_batch_size
-from llm2vec import LLM2Vec
-
+from ..dataloaders.text_dataloader import collate as text_collate
 
 model_types = ["cerebras",
                 "Pythia", 
@@ -131,7 +131,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                             output_hidden_states=True)
         self.num_layers = self.config.num_hidden_layers + 1 
         self.update_evaluation_layer(self.evaluation_layer_idx)
-        self.config.num_hidden_layers = self.evaluation_layer_idx
+        self.config.num_hidden_layers = self.evaluation_layer_idx # prevents loading all layers
 
         FROM_PRETRAINED_KWARGS = {
             'revision': self.model_specs.revision,
@@ -147,7 +147,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             elif 'supervised' in self.model_specs.model_family.lower():
                 FROM_PRETRAINED_KWARGS['peft_model_name_or_path'] = "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised"
             elif self.model_specs.model_family.lower() == 'llm2vec-mntp':
-                pass
+                FROM_PRETRAINED_KWARGS['peft_model_name_or_path'] = "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp"
             else:
                 raise ValueError(f"Model family {self.model_specs.model_family} not found")
         else:
@@ -189,7 +189,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                 batch_size=optimal_batch_size, 
                                 shuffle=False, 
                                 num_workers=8, 
-                                collate_fn=self.collate)
+                                collate_fn=text_collate)
 
         embeddings = self._encode_helper(dataloader, verbose=verbose)
 
@@ -207,7 +207,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         encoded_batches = []
 
         for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable= not verbose):
-            batch = {k: v.to(self._get_first_layer_device()) for k, v in batch.items()}
+            batch = self.prepare_inputs(batch)
             
             outputs = self.forward(**batch)
             hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
