@@ -13,6 +13,9 @@ from experiments.utils.dataloaders.text_dataloader import get_dataloader, get_au
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+from transformers.utils import logging
+logging.set_verbosity_error()
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_family', type=str, default='Pythia')
@@ -126,7 +129,12 @@ def main():
         
         encoding_kwargs = {'verbose': True}
         evaluator.create_output_folder = custom_create_output_folder
-        evaluator.run(model, kwargs=encoding_kwargs, output_folder='./mteb-results', raise_error=args.raise_error, overwrite_results=False, verbosity=2)
+        evaluator.run(model, 
+                      kwargs=encoding_kwargs, 
+                      output_folder='./mteb-results', 
+                      raise_error=args.raise_error,
+                      overwrite_results=False, 
+                      verbosity=2)
 
     elif args.purpose == 'run_entropy_metrics':
         run_entropy_metrics(model, model_specs, evaluator, args)
