@@ -143,6 +143,8 @@ def get_dataloader(
         try:
             dataset = load_dataset(dataset_name, trust_remote_code=True)[split]
         except KeyError as e:
+            raise KeyError(f"SplitDoesNotExist: The dataset {dataset_name} does not have split {split}. Raising error to skip this dataset/split")
+        except Exception as e:
             print(f"Failed to load dataset {dataset_name} with split {split} with error {e}")
             raise e
 
