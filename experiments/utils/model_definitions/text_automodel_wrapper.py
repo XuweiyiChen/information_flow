@@ -1,9 +1,9 @@
-from typing import Any, Callable, List, Literal, Type, Dict, Union
+from typing import Any, List
 
 import tqdm
 import numpy as np
 import torch
-from transformers import AutoModel, AutoTokenizer, AutoConfig, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoConfig, AutoModelForCausalLM
 from torch.utils.data import DataLoader
 from llm2vec import LLM2Vec
 
