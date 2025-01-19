@@ -1,0 +1,2000 @@
+processing layer 32
+Running evaluation for LLM2Vec-mntp 8B main layer 32
+─────────────────────────────── Selected tasks  ────────────────────────────────
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 776
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 551
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 71
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 83
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 101
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 124
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 78
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 80
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 112
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 108
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 35
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 68
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 90
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 81
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 128
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 67
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 54
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 55
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 46
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+processing layer 31
+Running evaluation for LLM2Vec-mntp 8B main layer 31
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+processing layer 30
+Running evaluation for LLM2Vec-mntp 8B main layer 30
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 776
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 551
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 71
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 83
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 101
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 124
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 78
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 80
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 112
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 108
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 35
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 68
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 90
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 81
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 128
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 67
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 55
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 55
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 46
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+processing layer 29
+Running evaluation for LLM2Vec-mntp 8B main layer 29
+─────────────────────────────── Selected tasks  ────────────────────────────────
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+processing layer 28
+Running evaluation for LLM2Vec-mntp 8B main layer 28
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 776
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 256, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 551
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 71
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 83
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 101
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 124
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 78
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 80
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 112
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 108
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 35
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 68
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 90
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 81
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 128
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 67
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 55
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 45
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 46
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+processing layer 27
+Running evaluation for LLM2Vec-mntp 8B main layer 27
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+processing layer 26
+Running evaluation for LLM2Vec-mntp 8B main layer 26
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+processing layer 25
+Running evaluation for LLM2Vec-mntp 8B main layer 25
+─────────────────────────────── Selected tasks  ────────────────────────────────
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 776
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 128, max_sentence_length: 551
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 71
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 83
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 101
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 124
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 78
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 80
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 112
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 108
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 35
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 68
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 90
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 81
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 128
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 67
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 50
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 54
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 46
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 4096, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 4096, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+processing layer 24
+Running evaluation for LLM2Vec-mntp 8B main layer 24
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+processing layer 23
+Running evaluation for LLM2Vec-mntp 8B main layer 23
+─────────────────────────────── Selected tasks  ────────────────────────────────
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 70
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 64, max_sentence_length: 776
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 269
+Starting batch size: 512, Optimal batch size: 128, max_sentence_length: 551
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 206
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 137
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 122
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 243
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 188
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 184
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 119
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 89
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 71
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 83
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 101
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 124
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 87
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 84
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 78
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 80
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 92
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 112
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 108
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 35
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 91
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 88
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 68
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 79
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 61
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 90
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 81
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 77
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 128
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 96
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 74
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 60
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 67
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 55
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 58
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 65
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 82
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 49
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 46
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 4096, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 18
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 4096, max_sentence_length: 34
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 31
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 39
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 26
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 20
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 2048, max_sentence_length: 30
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 24
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 21
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 23
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 22
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 25
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 19
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 62
+processing layer 22
+Running evaluation for LLM2Vec-mntp 8B main layer 22
+─────────────────────────────── Selected tasks  ────────────────────────────────
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+processing layer 21
+Running evaluation for LLM2Vec-mntp 8B main layer 21
+─────────────────────────────── Selected tasks  ────────────────────────────────
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+processing layer 20
+Running evaluation for LLM2Vec-mntp 8B main layer 20
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 69
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 56
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 57
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 86
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 94
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 52
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 114
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 93
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 64
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 72
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 97
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 51
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 53
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 63
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 59
+processing layer 19
+Running evaluation for LLM2Vec-mntp 8B main layer 19
+─────────────────────────────── Selected tasks  ────────────────────────────────
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+processing layer 18
+Running evaluation for LLM2Vec-mntp 8B main layer 18
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Starting batch size: 512, Optimal batch size: 512, max_sentence_length: 47
+Starting batch size: 512, Optimal batch size: 1024, max_sentence_length: 85
+processing layer 17
+Running evaluation for LLM2Vec-mntp 8B main layer 17
+─────────────────────────────── Selected tasks  ────────────────────────────────
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+processing layer 16
+Running evaluation for LLM2Vec-mntp 8B main layer 16
+─────────────────────────────── Selected tasks  ────────────────────────────────
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
