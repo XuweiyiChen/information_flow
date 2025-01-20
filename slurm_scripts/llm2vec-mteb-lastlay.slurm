@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=llm2vec-mntp-mteb-lastlay
-#SBATCH --time=16:00:00
+#SBATCH --time=32:00:00
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=20
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem-per-cpu=4G
+#SBATCH --mem-per-cpu=8G
 #SBATCH --open-mode=append
 #SBATCH --output=./%x_%j.out
 #SBATCH --error=./%x_%j.err
@@ -27,7 +27,6 @@ SIZE="8B"
 singularity exec --bind /scratch --nv --overlay ${OVERLAY_PATH}:ro ${SINGULARITY_IMAGE} /bin/bash -c "
 source /ext3/env.sh
 conda activate infoflow
-export PYTHONUNBUFFERED=TRUE
 
 for layer in \$(seq $MAX_LAYER -1 $MIN_LAYER); do
     echo \"processing layer \$layer\"
@@ -37,6 +36,6 @@ for layer in \$(seq $MAX_LAYER -1 $MIN_LAYER); do
         --revision $REVISION \
         --evaluation_layer \$layer \
         --purpose run_tasks \
-        --raise_error True
+        --raise_error False
 done
 "
