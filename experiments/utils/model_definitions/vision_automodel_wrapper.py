@@ -1,9 +1,3 @@
-import logging
-import time
-from typing import Any, Callable, List, Literal, Type, Dict, Union
-import gc
-
-import tqdm
 import numpy as np
 import torch
 from transformers import BatchFeature, AutoModel, AutoImageProcessor, AutoConfig, CLIPVisionModel, CLIPVisionConfig
@@ -12,7 +6,6 @@ from torch.utils.data import DataLoader
 import timm
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
-from ..misc.optimal_batch_size import find_optimal_batch_size
 from .jepa.JepaEncoder import load_jepa_encoder
 
 model_name_to_sizes = {

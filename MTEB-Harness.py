@@ -127,7 +127,7 @@ def main():
             output_folder.mkdir(parents=True, exist_ok=True)
             return output_folder
         
-        encoding_kwargs = {'verbose': True}
+        encoding_kwargs = {'verbose': False}
         evaluator.create_output_folder = custom_create_output_folder
         evaluator.run(model, 
                       kwargs=encoding_kwargs, 

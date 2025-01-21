@@ -48,7 +48,8 @@ def find_optimal_batch_size(model, number_of_samples, device, batch_size=512, ma
                 raise  # some other error not memory related
 
     if verbose:
-        print(f"Starting batch size: {original_batch_size}, Optimal batch size: {batch_size}, max_sentence_length: {max_sentence_length}")
+        pass # todo: add this back when its not so annoying
+        #print(f"Starting batch size: {original_batch_size}, Optimal batch size: {batch_size}, max_sentence_length: {max_sentence_length}")
 
     garbage_collect_cuda()
     return batch_size
