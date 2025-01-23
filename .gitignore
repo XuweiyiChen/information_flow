@@ -1,3 +1,4 @@
 src/
 *.pyc
 error_logs.txt
+lcc_logs/*
