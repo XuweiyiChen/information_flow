@@ -38,7 +38,7 @@ def run_entropy_metrics(
     metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'curvature']
     splits = ['train', 'test']
 
-    if model_specs.model_family == 'bert':
+    if model_specs.model_family in ["bert", "roberta"]:
         max_sample_length = 512
     else:
         max_sample_length = 2048
