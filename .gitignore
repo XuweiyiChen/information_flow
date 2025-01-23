@@ -2,3 +2,6 @@ src/
 *.pyc
 error_logs.txt
 lcc_logs/*
+datasets/*
+model_checkpoints/*
+experiments/large_results/*
