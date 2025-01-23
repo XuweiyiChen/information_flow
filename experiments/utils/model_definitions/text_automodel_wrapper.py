@@ -165,6 +165,9 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         **kwargs: Any
     ) -> np.ndarray:
         max_sample_length = kwargs.pop("max_sample_length", 2048)
+        if self.model_specs.model_family == "bert":
+            max_sample_length = 512
+            
         verbose = kwargs.pop("verbose", True)
 
         tokenized_sentences =  self.tokenizer(input_data,
@@ -176,7 +179,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         # find optimal batch size
         optimal_batch_size = find_optimal_batch_size(model=self._get_model_with_forward_pass(), 
                                                      number_of_samples=len(input_data),
-                                                     device=self._get_first_layer_device(),
+                                                     device=self.device,
                                                      max_sentence_length = tokenized_sentences.input_ids.shape[1], 
                                                      verbose=verbose)
         self.batch_size_hint = optimal_batch_size
