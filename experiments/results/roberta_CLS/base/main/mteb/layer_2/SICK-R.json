@@ -1,0 +1,26 @@
+{
+  "dataset_revision": "20a6d6f312dd54037fe07a32d58e5e168867909d",
+  "evaluation_time": 9.464903593063354,
+  "kg_co2_emissions": null,
+  "mteb_version": "1.14.19",
+  "scores": {
+    "test": [
+      {
+        "cosine_pearson": 0.35667097312152696,
+        "cosine_spearman": 0.3973607302947623,
+        "euclidean_pearson": 0.3862278126253296,
+        "euclidean_spearman": 0.3965405305186924,
+        "hf_subset": "default",
+        "languages": [
+          "eng-Latn"
+        ],
+        "main_score": 0.3973607302947623,
+        "manhattan_pearson": 0.4034464994836893,
+        "manhattan_spearman": 0.40197932234165057,
+        "pearson": 0.35667097312152696,
+        "spearman": 0.3973607302947623
+      }
+    ]
+  },
+  "task_name": "SICK-R"
+}
