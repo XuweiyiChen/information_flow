@@ -362,7 +362,7 @@ def multiview_collation(batch):
     return [(batch_indices, view, labels) for view in images_by_view]
 
 def prepare_dataloader(
-    train_dataset: Dataset, batch_size: int = 64, num_workers: int = 4, shuffle: bool = True, is_multiview: bool = False
+    train_dataset: Dataset, batch_size: int = 64, num_workers: int = 4, shuffle: bool = True, is_multiview: bool = False, drop_last: bool = True
 ) -> DataLoader:
     """Prepares the training dataloader for pretraining.
     Args:
@@ -379,7 +379,7 @@ def prepare_dataloader(
         shuffle=shuffle,
         num_workers=num_workers,
         pin_memory=True,
-        drop_last=True,
+        drop_last=drop_last,
         collate_fn=multiview_collation if is_multiview else None
     )
 

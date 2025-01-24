@@ -4,9 +4,14 @@ from transformers import BatchFeature, AutoModel, AutoImageProcessor, AutoConfig
 from transformers.models import dinov2
 from torch.utils.data import DataLoader
 import timm
+from torch.utils.data import Subset
+from torchvision import transforms
+from typing import Any, List
+import tqdm
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from .jepa.JepaEncoder import load_jepa_encoder
+from ..dataloaders.vision_dataloader import prepare_dataloader
 
 model_name_to_sizes = {
     'sam': ['base'],
@@ -169,3 +174,93 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     
     def _is_timm_model(self):
         return 'timm' in self.model_path
+    
+    
+    """
+    FUNCTIONS FOR INFERENCE
+    """
+    @torch.no_grad()
+    def encode(
+        self,
+        input_dataset: Subset,
+        return_raw_hidden_states: bool = False,
+        **kwargs: Any
+    ) -> np.ndarray:
+        verbose = kwargs.pop("verbose", True)
+
+        dataloader = prepare_dataloader(input_dataset, 
+                                        batch_size=256, 
+                                        num_workers=32,
+                                        shuffle=False,
+                                        is_multiview=False,
+                                        drop_last=False)
+
+        if return_raw_hidden_states:
+            embeddings, raw_hidden_states, layerwise_encodings, labels = self._encode_helper(dataloader, 
+                                                            verbose=verbose, 
+                                                            return_raw_hidden_states=return_raw_hidden_states)
+            return np.array(embeddings), raw_hidden_states, layerwise_encodings, labels
+        
+        else:
+            embeddings = self._encode_helper(dataloader, 
+                                            verbose=verbose, 
+                                            return_raw_hidden_states=return_raw_hidden_states) # shape: (num_samples, embedding_dim)
+            return np.array(embeddings)
+        
+
+    @torch.no_grad()
+    def _encode_helper(self, dataloader, verbose=False, return_raw_hidden_states=False) -> np.ndarray:
+        encoded_batches = []
+        layerwise_encoded_batches = []
+        labels = []
+
+        if return_raw_hidden_states:
+            # can be memory intensive, so only do if needed
+            raw_sample_hidden_states = []
+
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable= not verbose):
+            _, _, label = batch
+            labels.extend(label)
+            batch = self.prepare_inputs(batch)
+            
+            outputs = self.forward(**batch)
+
+            hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
+            hidden_states = self._get_pooled_hidden_states(hidden_states, method="mean")
+            encoded_batches.append(hidden_states.half().cpu())
+
+            if return_raw_hidden_states:
+                # get layerwise encodings for the batch
+                current_batch_layerwise_encodings = []
+                for layer_idx in range(len(outputs.hidden_states)):
+                    layer_states = outputs.hidden_states[layer_idx]
+                    layer_states = self._get_pooled_hidden_states(layer_states, method="mean")
+                    current_batch_layerwise_encodings.append(layer_states.half().cpu())
+                layerwise_encoded_batches.append(torch.stack(current_batch_layerwise_encodings))
+     
+                # get raw hidden states for each sample
+                for sample_idx in range(len(outputs.hidden_states[0])):
+                    sample_hidden_states = [
+                        layer_states[sample_idx] for layer_states in outputs.hidden_states
+                    ]
+                    sample_hidden_states = torch.stack(sample_hidden_states)
+                    raw_sample_hidden_states.append(sample_hidden_states.squeeze().half().cpu().numpy())
+
+        encodings = torch.cat(encoded_batches).squeeze().numpy() # shape: (num_samples, embedding_dim)
+        layerwise_encodings = torch.cat(layerwise_encoded_batches, dim=1).squeeze().numpy() # shape: (num_layers, num_samples, embedding_dim)
+
+        if return_raw_hidden_states:
+            return encodings, raw_sample_hidden_states, layerwise_encodings, labels
+        else:
+            return encodings
+    
+    @torch.no_grad()
+    def _get_pooled_hidden_states(self, hidden_states, method="mean"):
+        if method == "mean":
+            layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states])
+            return layer_means
+        
+        elif method == "last_hidden_state":
+            return hidden_states[:, -1]
+        else:
+            raise ValueError(f"Invalid pooling method: {method}")
