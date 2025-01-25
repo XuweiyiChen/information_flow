@@ -159,6 +159,10 @@ def load_all_results(
                                                     'dataset_name': task_name_to_dataset_name[task_name]
                                                 }
 
+                                                    
+                                # sort the layer keys 
+                                all_results[model_family][model_size][revision] = dict(sorted(all_results[model_family][model_size][revision].items(), key=lambda x: int(x[0].split('_')[1])))
+
 
 
                             # load metrics
@@ -210,4 +214,5 @@ def load_all_results(
 
                             if 'entropy_sentence' in all_results[model_family][model_size][revision][layer][task_name]:
                                 all_results[model_family][model_size][revision][layer][task_name]['entropy_sentence']['standardized_logD'] = (all_results[model_family][model_size][revision][layer][task_name]['entropy_sentence']['maxEntropy'] - mean_entropy_score) / std_entropy_score
+
     return all_results

@@ -18,6 +18,7 @@ model_types = ["cerebras",
                 "Medical-Llama3", 
                 "Llama3", 
                 "bert", 
+                "roberta",
                 "LLM2Vec-mntp-unsup-simcse", 
                 "LLM2Vec-mntp-supervised",
                 "LLM2Vec-mntp",
@@ -41,6 +42,7 @@ model_name_to_sizes = {
     'Medical-Llama3': medical_llama3_sizes,
     'Llama3': llama3_sizes,
     'bert': bert_sizes,
+    'roberta': bert_sizes,
     'LLM2Vec-mntp-unsup-simcse': LLM2Vec_sizes,
     'llama-instruct': llama_instruct_sizes,
     'LLM2Vec-mntp-supervised': LLM2Vec_sizes,
@@ -71,6 +73,9 @@ def get_model_path(name, size):
     elif name == "bert":
         assert size in bert_sizes
         return f"bert-{size}-uncased"
+    elif name == 'roberta':
+        assert size in bert_sizes
+        return f"FacebookAI/roberta-{size}"
     elif name == 'LLM2Vec-mntp-unsup-simcse':
         assert size in LLM2Vec_sizes
         return f"McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp"
@@ -165,6 +170,9 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         **kwargs: Any
     ) -> np.ndarray:
         max_sample_length = kwargs.pop("max_sample_length", 2048)
+        if self.model_specs.model_family in ["bert", "roberta"]:
+            max_sample_length = 512
+            
         verbose = kwargs.pop("verbose", True)
 
         tokenized_sentences =  self.tokenizer(input_data,
@@ -176,7 +184,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         # find optimal batch size
         optimal_batch_size = find_optimal_batch_size(model=self._get_model_with_forward_pass(), 
                                                      number_of_samples=len(input_data),
-                                                     device=self._get_first_layer_device(),
+                                                     device=self.device,
                                                      max_sentence_length = tokenized_sentences.input_ids.shape[1], 
                                                      verbose=verbose)
         self.batch_size_hint = optimal_batch_size

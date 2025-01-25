@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from experiments.utils.model_definitions.jepa.jepa_utils import apply_masks, trunc_normal_, repeat_interleave_batch
+from .jepa_utils import apply_masks, trunc_normal_, repeat_interleave_batch
 
 
 def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False):
