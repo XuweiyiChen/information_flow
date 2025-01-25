@@ -95,8 +95,8 @@ def get_model_path(name, size):
 
 
 class TextModelSpecifications(BaseModelSpecifications):
-    def __init__(self, model_family, model_size, revision):
-        super().__init__(model_family, model_size, revision)
+    def __init__(self, model_family, model_size, revision, ignore_checks=False):
+        super().__init__(model_family, model_size, revision, ignore_checks)
         self.model_path_func = get_model_path
 
     def additional_checks(self):
@@ -167,7 +167,8 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     def encode(
         self,
         input_data: List[str],
-        **kwargs: Any
+        return_raw_hidden_states: bool = False,
+        **kwargs: dict
     ) -> np.ndarray:
         max_sample_length = kwargs.pop("max_sample_length", 2048)
         if self.model_specs.model_family in ["bert", "roberta"]:
@@ -199,9 +200,19 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                 num_workers=8, 
                                 collate_fn=text_collate)
 
-        embeddings = self._encode_helper(dataloader, verbose=verbose)
-
-        return np.array(embeddings)
+        if return_raw_hidden_states:
+            embeddings, raw_hidden_states, layerwise_encodings = self._encode_helper(dataloader, 
+                                                            verbose=verbose, 
+                                                            return_raw_hidden_states=return_raw_hidden_states,
+                                                            **kwargs)
+            return np.array(embeddings), raw_hidden_states, layerwise_encodings
+        
+        else:
+            embeddings = self._encode_helper(dataloader, 
+                                            verbose=verbose, 
+                                            return_raw_hidden_states=return_raw_hidden_states,
+                                            **kwargs) # shape: (num_samples, embedding_dim)
+            return np.array(embeddings)
     
     
     def _get_model_with_forward_pass(self):
@@ -211,20 +222,55 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return self.model
     
     @torch.no_grad()
-    def _encode_helper(self, dataloader, verbose=False) -> np.ndarray:
+    def _encode_helper(self, dataloader, verbose=False, return_raw_hidden_states=False, **kwargs) -> np.ndarray:
+        pooling_method = kwargs.pop("pooling_method", "first_hidden_state")
         encoded_batches = []
+        layerwise_encoded_batches = []
+
+        if return_raw_hidden_states:
+            # can be memory intensive, so only do if needed
+            raw_sample_hidden_states = []
 
         for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable= not verbose):
             batch = self.prepare_inputs(batch)
             
             outputs = self.forward(**batch)
-            hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
-            hidden_states = self._get_pooled_hidden_states(hidden_states, batch["attention_mask"], method="mean")
 
+            hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
+            hidden_states = self._get_pooled_hidden_states(hidden_states, batch["attention_mask"], method=pooling_method)
             encoded_batches.append(hidden_states.float().cpu())
 
-        encodings = torch.cat(encoded_batches).squeeze().numpy()
-        return encodings
+            if return_raw_hidden_states:
+                # get layerwise encodings for the batch
+                current_batch_layerwise_encodings = []
+                for layer_idx in range(len(outputs.hidden_states)):
+                    layer_states = outputs.hidden_states[layer_idx]
+
+
+                    layer_states = self._get_pooled_hidden_states(layer_states, batch["attention_mask"], method=pooling_method)
+                    current_batch_layerwise_encodings.append(layer_states.float().cpu())
+                layerwise_encoded_batches.append(torch.stack(current_batch_layerwise_encodings))
+     
+                # get raw hidden states for each sample
+                for sample_idx in range(len(outputs.hidden_states[0])):
+                    pad_idx = batch['attention_mask'][sample_idx] == 0
+
+                    sample_hidden_states = [
+                        layer_states[sample_idx][~pad_idx]
+                        for layer_states in outputs.hidden_states
+                    ]
+                    sample_hidden_states = torch.stack(sample_hidden_states)
+                    raw_sample_hidden_states.append(sample_hidden_states.squeeze().float().cpu().numpy())
+
+        encodings = torch.cat(encoded_batches).squeeze().numpy() # shape: (num_samples, embedding_dim)
+        if len(encodings.shape) == 1:
+            encodings = encodings.unsqueeze(0)
+
+        if return_raw_hidden_states:
+            layerwise_encodings = torch.cat(layerwise_encoded_batches, dim=1).squeeze().numpy() # shape: (num_layers, num_samples, embedding_dim)
+            return encodings, raw_sample_hidden_states, layerwise_encodings
+        else:
+            return encodings
     
     @torch.no_grad()
     def _get_pooled_hidden_states(self, hidden_states, attention_mask, method="mean"):
@@ -243,6 +289,8 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         
         elif method == "last_hidden_state":
             return hidden_states[:, -1]
+        elif method == "first_hidden_state":
+            return hidden_states[:, 0]
         else:
             raise ValueError(f"Invalid pooling method: {method}")
         

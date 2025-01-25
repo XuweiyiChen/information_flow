@@ -193,7 +193,35 @@ def load_all_results(
                                                             except Exception as e:
                                                                 #print(f"Error: {e}", model_family, model_size, revision, f"layer_{layer}", correct_task_name, metric_name, metric_normalization, metric_value)
                                                                 pass
-   
+
+                            # load wikitext metrics
+                            metrics_path = os.path.join(revision_path, "metrics", "wikitext")
+                
+                            if os.path.isdir(metrics_path):
+                                for metric_file in os.listdir(metrics_path):
+                                    if metric_file.endswith('.pkl'):
+                                        metric_name = os.path.splitext(metric_file)[0]
+                                        file_path = os.path.join(metrics_path, metric_file)
+                                        with open(file_path, 'rb') as f:
+                                            metric_results = pickle.load(f)
+
+                                        # each metric pkl is a dictionary of lists of floats, one float per layer
+                                        # we need to put this into the already existing all_results structure
+                                        for metric_normalization, metric_values in metric_results.items():
+                                            for layer, metric_value in enumerate(metric_values):
+                                                correct_task_name = 'wikitext'
+                                                try:
+                                                    if not correct_task_name in all_results[model_family][model_size][revision][f"layer_{layer}"]:
+                                                        all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name] = {}
+
+                                                    if not metric_name in all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name]:
+                                                        all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name] = {}
+                                                    all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name][metric_normalization] = metric_value
+                                                except Exception as e:
+                                                    # raise e
+                                                    # print(f"Error: {e}", model_family, model_size, revision, f"layer_{layer}", correct_task_name, metric_name, metric_normalization, metric_value)
+                                                    pass
+
     if should_normalize_scores_across_models:
         for model_family in all_results:
             for model_size in all_results[model_family]:
@@ -210,6 +238,9 @@ def load_all_results(
                         print(mean_entropy_score, std_entropy_score)    
 
                         for task_name in all_results[model_family][model_size][revision][layer]:
+                            if task_name == 'wikitext':
+                                continue
+
                             all_results[model_family][model_size][revision][layer][task_name]['standardized_main_score'] = (all_results[model_family][model_size][revision][layer][task_name]['main_score'] - mean_main_score) / std_main_score
 
                             if 'entropy_sentence' in all_results[model_family][model_size][revision][layer][task_name]:

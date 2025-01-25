@@ -2,7 +2,7 @@
 USE_SLURM=0
 
 MODEL_NAME="Pythia"
-MODEL_SIZES=('1b' '14m' '70m' '160m' '410m')
+MODEL_SIZES=('14m' '70m' '160m' '410m' '1b')
 REVISION="main"
 PURPOSE="run_entropy_metrics"
 

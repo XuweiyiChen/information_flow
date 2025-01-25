@@ -170,7 +170,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             }
             inputs = {k: v.to("cuda") for k, v in inputs.items()}
 
-        return inputs
+        return inputs, labels
     
     def _is_timm_model(self):
         return 'timm' in self.model_path
@@ -264,3 +264,18 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return hidden_states[:, -1]
         else:
             raise ValueError(f"Invalid pooling method: {method}")
+        
+    @property
+    def num_features(self):
+        if hasattr(self.model, "num_features"):
+            return self.model.num_features
+        elif hasattr(self.model, "inplanes"):
+            return self.model.inplanes
+        elif hasattr(self.model.config, "hidden_size"):
+            return self.model.config.hidden_size
+        else:
+            raise ValueError("Could not find num_features or inplanes")
+
+    @property
+    def parameters(self):
+        return self.model.parameters

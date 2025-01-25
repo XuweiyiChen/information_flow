@@ -13,19 +13,19 @@ class BaseModelSpecifications:
         model_size (str): The size of the model.
         revision (str): The huggingface revision of the model.
     """
-    def __init__(self, model_family, model_size, revision):
+    def __init__(self, model_family, model_size, revision, ignore_checks=False):
         self.model_family = model_family
         self.model_size = model_size
         self.revision = revision
 
-        self.do_checks()
+        if not ignore_checks:
+            self.do_checks()
     
     def do_checks(self):
         self.additional_checks()
 
     def additional_checks(self):
-        pass
-        #raise NotImplementedError("This is a base class, please implement the additional_checks method")
+        raise NotImplementedError("This is a base class, please implement the additional_checks method")
     
     def __str__(self):
         return f"""
