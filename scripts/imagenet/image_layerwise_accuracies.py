@@ -13,6 +13,13 @@ parser.add_argument("--model_size", type=str, default="base")
 parser.add_argument("--layer", type=int, default=-1)
 args = parser.parse_args()
 
+# if results already exist, skip
+results_path = f"experiments/results/{args.model_family}/{args.model_size}/imagenet/layer_{args.layer}.pkl"
+if not os.path.exists(results_path):
+    os.makedirs(os.path.dirname(results_path), exist_ok=True)
+else:
+    print(f"Results already exist for {args.model_family} {args.model_size} layer {args.layer}")
+    exit()
 
 # load data
 save_path = f"embeddings/{args.model_family}/{args.model_size}/imagenet"
@@ -50,9 +57,6 @@ trainer.fit(probe, train_dataloader, val_dataloader)
 accuracies = dict(probe.trainer.callback_metrics)
 accuracies = {k: v.item() for k, v in accuracies.items()}
 
-results_path = f"experiments/results/{args.model_family}/{args.model_size}/imagenet/layer_{args.layer}.pkl"
-if not os.path.exists(results_path):
-    os.makedirs(os.path.dirname(results_path), exist_ok=True)
 with open(results_path, "wb") as f:
     pickle.dump(accuracies, f)
 
