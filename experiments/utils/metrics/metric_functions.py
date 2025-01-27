@@ -78,10 +78,13 @@ def compute_dime(hidden_states, alpha=1, normalizations=['maxEntropy']):
     augmentation_A_covs = [cov[0].double() for cov in cov]
     augmentation_B_covs = [cov[1].double() for cov in cov]
     
-    dimes = [
-        dent.doe(augmentation_A_covs[idx].double(), augmentation_B_covs[idx].double(), alpha=alpha, n_iters=10).item() 
-        for idx in range(L)
-    ]
+    dimes = []
+    for idx in range(L):
+        try:
+            dimes.append(dent.doe(augmentation_A_covs[idx].double(), augmentation_B_covs[idx].double(), alpha=alpha, n_iters=10).item())
+        except Exception as e:
+            dimes.append(np.nan)
+
     return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in dimes] for norm in normalizations}
 
 def compute_infonce(hidden_states, temperature=0.1):
@@ -199,7 +202,12 @@ def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
         cov = torch.matmul(hidden_states, hidden_states.transpose(1, 2)) # L x D x D
 
     cov = torch.clamp(cov, min=0)
-    entropies = [itl.matrixAlphaEntropy(LAYER_COV.double(), alpha=alpha).item() for LAYER_COV in cov]
+    entropies = []
+    for layer_cov in cov:
+        try:
+            entropies.append(itl.matrixAlphaEntropy(layer_cov.double(), alpha=alpha).item())
+        except Exception as e:
+            entropies.append(np.nan)
 
     return {norm: [entropy_normalization(x, norm, N, D) for x in entropies] for norm in normalizations}
 
@@ -265,9 +273,14 @@ def compute_lidar(hidden_states, alpha=1, normalizations=['maxEntropy'], return_
     """
     L, NUM_SAMPLES, NUM_AUG, D = hidden_states.shape
 
-    lda_matrices = [compute_LDA_matrix(layer.double(), return_within_class_scatter=return_within_scatter) for layer in hidden_states]
-    entropies = [itl.matrixAlphaEntropy(lda_matrix, alpha=alpha).item() for lda_matrix in lda_matrices]
-    return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in entropies] for norm in normalizations}
+    lidars = []
+    for layer in hidden_states:
+        try:
+            lda_matrix = compute_LDA_matrix(layer.double(), return_within_class_scatter=return_within_scatter)
+            lidars.append(itl.matrixAlphaEntropy(lda_matrix, alpha=alpha).item())
+        except Exception as e:
+            lidars.append(np.nan)
+    return {norm: [entropy_normalization(x, norm, NUM_SAMPLES, D) for x in lidars] for norm in normalizations}
 
 
 

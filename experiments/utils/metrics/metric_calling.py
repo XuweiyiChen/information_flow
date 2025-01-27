@@ -62,7 +62,7 @@ class EvaluationMetricSpecifications:
     def __str__(self):
         return f"Metric: {self.evaluation_metric}"
 
-def compute_per_forward_pass(model, dataloader, num_examples,compute_function, should_average_over_layers=False, **kwargs):
+def compute_per_forward_pass(model, dataloader, num_examples,compute_function, should_average_over_layers=True, **kwargs):
     """
     Compute a metric for each forward pass through the model.
 
@@ -78,7 +78,7 @@ def compute_per_forward_pass(model, dataloader, num_examples,compute_function, s
     results = {}
     with torch.no_grad():
         for batch in tqdm.tqdm(dataloader, total=num_examples, disable=DISABLE_TQDM, desc="Processing batches"):
-            batch = model.prepare_inputs(batch)
+            batch, _ = model.prepare_inputs(batch)
             outputs = model(**batch)
             
             if hasattr(outputs, 'hidden_states'):
@@ -130,13 +130,13 @@ def compute_on_concatenated_passes(model, dataloader, num_examples, compute_func
     all_hidden_states = []
 
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=num_examples, disable=DISABLE_TQDM):
-            if not isinstance(batch, tuple) and not isinstance(batch, list):
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM):
+            if not isinstance(batch, tuple) and len(batch) == 3:
                 batch = (batch,)
             
             batch_hidden_states = []
             for sub_batch in batch:
-                sub_batch = model.prepare_inputs(sub_batch)
+                sub_batch, _ = model.prepare_inputs(sub_batch)
                
                 outputs = model(**sub_batch)
                 hidden_states = [mf.normalize(x.squeeze()) for x in outputs.hidden_states] # L x BS x NUM_TOKENS x D
@@ -144,7 +144,7 @@ def compute_on_concatenated_passes(model, dataloader, num_examples, compute_func
                 # uncomment for CLS token
                 #layer_means = torch.stack([x[:, 0, :] for x in hidden_states]) # L x BS x D
                 
-                layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states]) # L x BS x D
+                layer_means = torch.stack([torch.mean(x, dim=1) for x in hidden_states]) # L x BS x D
                 if len(layer_means.shape) == 2:
                     layer_means = layer_means.unsqueeze(1) # L x BS x D
 
@@ -152,14 +152,8 @@ def compute_on_concatenated_passes(model, dataloader, num_examples, compute_func
             
             all_hidden_states.append(torch.stack(batch_hidden_states)) # NUM_AUG x L x BS x D
  
-    concatenated_states = torch.stack(all_hidden_states) # NUM_BATCHES x NUM_AUG x L x BS x D
-    concatenated_states = concatenated_states.view(
-        concatenated_states.shape[0] * concatenated_states.shape[3], 
-        concatenated_states.shape[1],
-        concatenated_states.shape[2],
-        concatenated_states.shape[4]
-    ) # NUM_SAMPLES x NUM_AUG x L x D
-    concatenated_states = concatenated_states.permute(2, 0, 1, 3) # L x NUM_SAMPLES x NUM_AUG x D
+    concatenated_states = torch.cat(all_hidden_states, dim=2) # NUM_AUG x L x BS x D
+    concatenated_states = concatenated_states.permute(1, 2, 0, 3) # L x NUM_SAMPLES x NUM_AUG x D
     concatenated_states = concatenated_states.squeeze()
     return compute_function(concatenated_states, **kwargs)
 

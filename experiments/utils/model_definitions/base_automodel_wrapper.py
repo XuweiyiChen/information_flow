@@ -81,6 +81,8 @@ class BaseLayerwiseAutoModelWrapper:
             # BERT needs special handling because the device map is not supported
             # https://github.com/huggingface/transformers/issues/25296
             return {'device': self.model.device}
+        elif hasattr(self.model, 'device'):
+            return {'device': self.model.device}
         else:
             raise ValueError("Could not find hf_device_map")
     

@@ -348,7 +348,8 @@ def prepare_datasets(
             train_dataset.samples = [tuple(p) for p in zip(files, labels)]
 
     if number_of_samples > 0:
-        train_dataset = torch.utils.data.Subset(train_dataset, range(number_of_samples))
+        random_indices = random.sample(range(len(train_dataset)), number_of_samples)
+        train_dataset = torch.utils.data.Subset(train_dataset, random_indices)
 
     return train_dataset
 

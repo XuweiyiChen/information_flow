@@ -1,6 +1,6 @@
 import gc
 import torch
-from utils.model_definitions.vision_automodel_wrapper import VisionLayerwiseAutoModelWrapper
+from experiments.utils.model_definitions.vision_automodel_wrapper import VisionLayerwiseAutoModelWrapper
 
 def garbage_collect_cuda():
     gc.collect()

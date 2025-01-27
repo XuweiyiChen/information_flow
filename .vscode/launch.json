@@ -9,13 +9,13 @@
             "name": "MTEB Harness",
             "type": "debugpy",
             "request": "launch",
-            "program": "experiments/mteb-harness.py",
+            "program": "MTEB-Harness.py",
             "console": "integratedTerminal",
             "args": [
                 "--model_family", "LLM2Vec-mntp",
                 "--model_size", "8B",
                 "--revision", "main",
-                "--evaluation_layer", "1",
+                "--evaluation_layer", "8",
                 "--base_results_path", "experiments/results",
                 "--purpose", "run_tasks",
                 "--raise_error", "True"
