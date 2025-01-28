@@ -24,6 +24,7 @@ model_name_to_sizes = {
     'deit': ['base'],
     'clip': ['base', 'large'],
     'i-jepa': ['imagenet1k', 'imagenet21k'],
+    'beit': ['base', 'large'],
 }
 model_types = list(model_name_to_sizes.keys())
 
@@ -57,6 +58,8 @@ def get_model_path(name, size):
             return "openai/clip-vit-large-patch14"
     elif name == 'i-jepa':
         return ""
+    elif name == 'beit':
+        return f"microsoft/beit-{size}-patch16-224"
 
 def update_config(config, model_specs):
     if model_specs.model_family == 'mae':
@@ -153,9 +156,8 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         else:
             return self.forward(**kwargs)
         
-    def prepare_inputs(self, batch):
+    def prepare_inputs(self, batch, return_labels=False):
         batch_idx, images, labels = batch
-        batch_size = len(batch_idx)
             
         if isinstance(images, BatchFeature):
             inputs = images.to("cuda")
@@ -170,7 +172,10 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             }
             inputs = {k: v.to("cuda") for k, v in inputs.items()}
 
-        return inputs, labels
+        if return_labels:
+            return inputs, labels
+        else:
+            return inputs
     
     def _is_timm_model(self):
         return 'timm' in self.model_path
@@ -255,7 +260,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return encodings
     
     @torch.no_grad()
-    def _get_pooled_hidden_states(self, hidden_states, method="mean"):
+    def _get_pooled_hidden_states(self, hidden_states, attention_mask, method="mean"):
         if method == "mean":
             layer_means = torch.stack([torch.mean(x, dim=0) for x in hidden_states])
             return layer_means
