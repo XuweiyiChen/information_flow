@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument('--revision', type=str, default='main')
     parser.add_argument('--evaluation_layer', type=int, default=-1, help='Layer to use for evaluation. -1 for the final layer. This is 0-indexed.')
     parser.add_argument('--base_results_path', type=str, default='experiments/results')
-    parser.add_argument('--purpose', type=str, default='run_tasks', choices=['run_tasks', 'run_entropy_metrics', 'download_datasets'])
+    parser.add_argument('--purpose', type=str, default='run_entropy_metrics', choices=['run_tasks', 'run_entropy_metrics', 'run_wikitext_metrics', 'download_datasets'])
     parser.add_argument('--raise_error', type=bool, default=False)
     return parser.parse_args()
 
@@ -34,8 +34,15 @@ def run_entropy_metrics(
         MTEB_evaluator: mteb.MTEB,
         args
 ):
-    task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
+    
     metrics = ['prompt-entropy', 'dataset-entropy', 'infonce', 'dime', 'lidar',  'curvature']
+
+    if args.purpose == 'run_wikitext_metrics':
+        task_datasets = ['wikitext']
+        splits = ['train']
+    else:
+        task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
+        task_datasets += ['wikitext']
     splits = ['test']
 
     if model_specs.model_family in ["bert", "roberta"]:
@@ -44,7 +51,7 @@ def run_entropy_metrics(
         max_sample_length = 2048
 
     # get maximum batch size for the model
-    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=max_sample_length)
+    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=max_sample_length)//2
     print(f"Optimal batch size: {optimal_batch_size}")
 
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
@@ -136,7 +143,7 @@ def main():
                       overwrite_results=False, 
                       verbosity=2)
 
-    elif args.purpose == 'run_entropy_metrics':
+    elif args.purpose == 'run_entropy_metrics' or args.purpose == 'run_wikitext_metrics':
         run_entropy_metrics(model, model_specs, evaluator, args)
 
     elif args.purpose == 'download_datasets':
