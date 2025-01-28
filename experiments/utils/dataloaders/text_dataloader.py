@@ -94,7 +94,7 @@ def get_dataloader(
     assert context_length_ratio <= 1
 
     if dataset_name == 'wikitext':
-        dataset = load_dataset("wikitext", 'wikitext-103-v1', keep_in_memory=True)[split]
+        dataset = load_dataset("wikitext", 'wikitext-103-v1')[split]
     
         # filter out unneeded samples
         num_samples = min(num_samples, len(dataset))
@@ -140,7 +140,7 @@ def get_dataloader(
 
     elif 'mteb' in dataset_name:
         try:
-            dataset = load_dataset(dataset_name, trust_remote_code=True, keep_in_memory=True)[split]
+            dataset = load_dataset(dataset_name, trust_remote_code=True)[split]
         except KeyError as e:
             raise KeyError(f"SplitDoesNotExist: The dataset {dataset_name} does not have split {split}. Raising error to skip this dataset/split")
         except Exception as e:
@@ -179,6 +179,33 @@ def get_dataloader(
                             collate_fn=collate)
     return dataloader
 
+def multiview_collate(batch, tokenizer, max_sample_length=2048, num_views=8):
+    """
+    Collates and augments each sample in the batch multiple times.
+    Returns a list of augmented batches.
+    """
+    # Augment each sample in the batch num_views times
+    augmented_batches = []
+    for _ in range(num_views):
+        augmented_batch = []
+        for item in batch:
+            # Get text from input_ids
+            text = item['text']
+            # Augment single text
+            augmented_text = text_augmentation([text], num_augmentations_per_sample=1)[0]
+            # Tokenize back
+            augmented_tokens = tokenizer(augmented_text, truncation=True, max_length=max_sample_length)
+            augmented_batch.append({
+                'input_ids': torch.tensor(augmented_tokens['input_ids']),
+                'attention_mask': torch.tensor(augmented_tokens['attention_mask'])
+            })
+        
+        # Collate the augmented batch
+        collated = collate(augmented_batch)
+        augmented_batches.append(collated)
+    
+    return tuple(augmented_batches)
+
 def get_augmentation_collated_dataloader(
         tokenizer, 
         dataset_name, 
@@ -188,53 +215,38 @@ def get_augmentation_collated_dataloader(
         min_length=2,
         max_length=None, 
         num_samples=10000, 
-        filter_text_columns=True,
+        filter_text_columns=False,
         max_sample_length=2048,
         num_workers=8,
         batch_size=1,
     ):
+    # Get base dataset without augmentation
+    base_dataset = get_dataloader(
+        tokenizer, 
+        dataset_name, 
+        split=split, 
+        context_length_ratio=context_length_ratio, 
+        min_length=min_length,
+        max_length=max_length, 
+        num_samples=num_samples, 
+        filter_text_columns=False, 
+        augment=False,
+        return_dataset=True,
+        max_sample_length=max_sample_length,
+        num_workers=num_workers,
+        batch_size=batch_size
+    )
 
-    base_datasets = [
-        get_dataloader(
-            tokenizer, 
-            dataset_name, 
-            split=split, 
-            context_length_ratio=context_length_ratio, 
-            min_length=min_length,
-            max_length=max_length, 
-            num_samples=num_samples, 
-            filter_text_columns=filter_text_columns, 
-            augment=True,
-            return_dataset=True,
-            max_sample_length=max_sample_length,
-            num_workers=num_workers,
-            batch_size=batch_size
-        ) for _ in range(num_augmentations_per_sample)
-    ]
+    # Create dataloader with custom collate function
+    dataloader = DataLoader(
+        base_dataset,
+        shuffle=False,
+        num_workers=num_workers,
+        batch_size=batch_size,
+        collate_fn=lambda batch: multiview_collate(batch, tokenizer, max_sample_length=max_sample_length, num_views=num_augmentations_per_sample)
+    )
 
-    lengths = [len(d) for d in base_datasets]
-    assert all([l == lengths[0] for l in lengths])
-
-    # unroll input_ids and attention_mask into pairs
-    batch_split_datasets = [
-        [{'input_ids': dataset['input_ids'][i], 
-          'attention_mask': dataset['attention_mask'][i]} 
-         for i in range(len(dataset['input_ids']))]
-        for dataset in base_datasets
-    ]
-
-    # batchify
-    batch_split_datasets = [
-        [dataset[i:i+batch_size] for i in range(0, len(dataset), batch_size)]
-        for dataset in batch_split_datasets
-    ]
-
-    collated_datasets = [[collate(batch) for batch in dataset] for dataset in batch_split_datasets]
-
-    # zip the datasets together
-    dataset_iterator = zip(*collated_datasets)
-
-    return dataset_iterator
+    return dataloader
 
 
 def embed_sentences_and_get_outputs(model, tokenizer, sentences: list[str]):
