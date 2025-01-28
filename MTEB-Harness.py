@@ -35,7 +35,7 @@ def run_entropy_metrics(
         args
 ):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
-    metrics = ['infonce', 'dime', 'lidar', 'sentence-entropy', 'curvature']
+    metrics = ['prompt-entropy', 'dataset-entropy', 'infonce', 'dime', 'lidar',  'curvature']
     splits = ['train', 'test']
 
     if model_specs.model_family in ["bert", "roberta"]:
@@ -70,10 +70,10 @@ def run_entropy_metrics(
             )
             if os.path.exists(results_path):
                 print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
-                continue
+                #continue
 
             # Get the dataloader. Depending on the metric, might need augmentations
-            if metric in ['sentence-entropy', 'dataset-entropy', 'curvature']:
+            if metric in ['prompt-entropy', 'dataset-entropy', 'curvature']:
                 dataloader = get_dataloader(model.tokenizer, **dataloader_kwargs)
             elif metric in ['dime', 'infonce']:
                 dataloader_kwargs['num_augmentations_per_sample'] = 2
