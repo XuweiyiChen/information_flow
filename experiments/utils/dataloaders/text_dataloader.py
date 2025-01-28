@@ -94,7 +94,7 @@ def get_dataloader(
     assert context_length_ratio <= 1
 
     if dataset_name == 'wikitext':
-        dataset = load_dataset("wikitext", 'wikitext-103-v1')[split]
+        dataset = load_dataset("wikitext", 'wikitext-103-v1', keep_in_memory=True)[split]
     
         # filter out unneeded samples
         num_samples = min(num_samples, len(dataset))
@@ -140,7 +140,7 @@ def get_dataloader(
 
     elif 'mteb' in dataset_name:
         try:
-            dataset = load_dataset(dataset_name, trust_remote_code=True)[split]
+            dataset = load_dataset(dataset_name, trust_remote_code=True, keep_in_memory=True)[split]
         except KeyError as e:
             raise KeyError(f"SplitDoesNotExist: The dataset {dataset_name} does not have split {split}. Raising error to skip this dataset/split")
         except Exception as e:
@@ -215,7 +215,24 @@ def get_augmentation_collated_dataloader(
     lengths = [len(d) for d in base_datasets]
     assert all([l == lengths[0] for l in lengths])
 
-    dataset_iterator = zip(*base_datasets)
+    # unroll input_ids and attention_mask into pairs
+    batch_split_datasets = [
+        [{'input_ids': dataset['input_ids'][i], 
+          'attention_mask': dataset['attention_mask'][i]} 
+         for i in range(len(dataset['input_ids']))]
+        for dataset in base_datasets
+    ]
+
+    # batchify
+    batch_split_datasets = [
+        [dataset[i:i+batch_size] for i in range(0, len(dataset), batch_size)]
+        for dataset in batch_split_datasets
+    ]
+
+    collated_datasets = [[collate(batch) for batch in dataset] for dataset in batch_split_datasets]
+
+    # zip the datasets together
+    dataset_iterator = zip(*collated_datasets)
 
     return dataset_iterator
 

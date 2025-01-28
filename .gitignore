@@ -1,7 +1,18 @@
+# hide folders and symlinks
 src/
-*.pyc
-error_logs.txt
 lcc_logs/*
 datasets/*
 model_checkpoints/*
 experiments/large_results/*
+embeddings/*
+embeddings
+experiments/checkpoints/*
+
+# hide particular files
+*.png
+*.sh
+*.pyc
+error_logs.txt
+
+# hide papermill notebooks
+experiments/output*.ipynb

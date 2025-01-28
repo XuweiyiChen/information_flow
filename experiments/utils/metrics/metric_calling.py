@@ -8,7 +8,7 @@ import repitl.difference_of_entropies as dent
 
 from . import metric_functions as mf
 from ..model_definitions.base_automodel_wrapper import BaseModelSpecifications
-
+from ..model_definitions.text_automodel_wrapper import TextLayerwiseAutoModelWrapper
 DISABLE_TQDM = False
 
 metric_name_to_function = {
@@ -33,8 +33,8 @@ class EvaluationMetricSpecifications:
         self.num_samples = num_samples
 
         
-        if self.evaluation_metric == 'sentence-entropy':
-            self.granularity = 'sentence'
+        if self.evaluation_metric == 'prompt-entropy':
+            self.granularity = 'prompt'
             self.evaluation_metric = 'entropy'
         elif self.evaluation_metric == 'dataset-entropy':
             self.granularity = 'dataset'
@@ -53,7 +53,7 @@ class EvaluationMetricSpecifications:
 
     def do_checks(self):
         assert self.evaluation_metric in metric_name_to_function.keys()
-        assert self.granularity in ['sentence', 'dataset', None]
+        assert self.granularity in ['prompt', 'dataset', None]
 
         assert self.alpha > 0
         assert self.num_samples > 0
@@ -62,7 +62,7 @@ class EvaluationMetricSpecifications:
     def __str__(self):
         return f"Metric: {self.evaluation_metric}"
 
-def compute_per_forward_pass(model, dataloader, num_examples,compute_function, should_average_over_layers=True, **kwargs):
+def compute_per_forward_pass(model, dataloader,compute_function, should_average_over_layers=True, **kwargs):
     """
     Compute a metric for each forward pass through the model.
 
@@ -77,8 +77,8 @@ def compute_per_forward_pass(model, dataloader, num_examples,compute_function, s
     """
     results = {}
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=num_examples, disable=DISABLE_TQDM, desc="Processing batches"):
-            batch, _ = model.prepare_inputs(batch)
+        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM, desc="Processing batches"):
+            batch = model.prepare_inputs(batch)
             outputs = model(**batch)
             
             if hasattr(outputs, 'hidden_states'):
@@ -89,7 +89,7 @@ def compute_per_forward_pass(model, dataloader, num_examples,compute_function, s
                 hidden_states = outputs
 
             for sample_idx in range(len(hidden_states[0])):
-                if hasattr(batch, 'attention_mask'):
+                if 'attention_mask' in batch.keys():
                     # ignore padding tokens
                     pad_idx = batch['attention_mask'][sample_idx] == 0
                 else:
@@ -113,14 +113,13 @@ def compute_per_forward_pass(model, dataloader, num_examples,compute_function, s
     else:
         return {norm: np.array(values) for norm, values in results.items()}
 
-def compute_on_concatenated_passes(model, dataloader, num_examples, compute_function, **kwargs):
+def compute_on_concatenated_passes(model, dataloader, compute_function, **kwargs):
     """
     Compute a metric on concatenated hidden states from multiple forward passes.
 
     Args:
         model (torch.nn.Module): The model to use for forward passes.
         dataloader (torch.utils.data.DataLoader): The dataloader providing batches.
-        num_examples (int): The number of examples in the dataloader, can be tough to get directly from the dataloader in some cases. Only used for tqdm.
         compute_function (callable): The function to compute the metric.
         **kwargs: Additional keyword arguments to pass to compute_function.
 
@@ -130,31 +129,42 @@ def compute_on_concatenated_passes(model, dataloader, num_examples, compute_func
     all_hidden_states = []
 
     with torch.no_grad():
-        for batch in tqdm.tqdm(dataloader, total=len(dataloader), disable=DISABLE_TQDM):
-            if not isinstance(batch, tuple) and len(batch) == 3:
-                batch = (batch,)
+        for batch in tqdm.tqdm(dataloader, disable=DISABLE_TQDM):
+            if not isinstance(batch, tuple):
+                if isinstance(model, TextLayerwiseAutoModelWrapper):
+                    batch = (batch,)
+                elif len(batch) == 3:
+                    # for vision model case
+                    batch = (batch,)
             
             batch_hidden_states = []
             for sub_batch in batch:
-                sub_batch, _ = model.prepare_inputs(sub_batch)
+                sub_batch = model.prepare_inputs(sub_batch)
                
                 outputs = model(**sub_batch)
-                hidden_states = [mf.normalize(x.squeeze()) for x in outputs.hidden_states] # L x BS x NUM_TOKENS x D
-                
-                # uncomment for CLS token
-                #layer_means = torch.stack([x[:, 0, :] for x in hidden_states]) # L x BS x D
-                
-                layer_means = torch.stack([torch.mean(x, dim=1) for x in hidden_states]) # L x BS x D
-                if len(layer_means.shape) == 2:
-                    layer_means = layer_means.unsqueeze(1) # L x BS x D
+                if 'attention_mask' in sub_batch.keys():
+                    attention_mask = sub_batch['attention_mask']
+                else:
+                    attention_mask = None
 
-                batch_hidden_states.append(layer_means)
+                layerwise_mean_tokens = [
+                    model._get_pooled_hidden_states(layer_states, attention_mask, method='mean')
+                    for layer_states in outputs.hidden_states
+                ]  # L x BS x D
+                layerwise_mean_tokens = [mf.normalize(x.squeeze()) for x in layerwise_mean_tokens] # L x BS x D
+                layerwise_mean_tokens = torch.stack(layerwise_mean_tokens) # L x BS x D
+
+                if len(layerwise_mean_tokens.shape) == 2:
+                    layerwise_mean_tokens = layerwise_mean_tokens.unsqueeze(1) # L x BS x D
+
+                batch_hidden_states.append(layerwise_mean_tokens)
             
             all_hidden_states.append(torch.stack(batch_hidden_states)) # NUM_AUG x L x BS x D
  
-    concatenated_states = torch.cat(all_hidden_states, dim=2) # NUM_AUG x L x BS x D
+    concatenated_states = torch.cat(all_hidden_states, dim=2) # NUM_AUG x L x NUM_SAMPLES x D
     concatenated_states = concatenated_states.permute(1, 2, 0, 3) # L x NUM_SAMPLES x NUM_AUG x D
     concatenated_states = concatenated_states.squeeze()
+    print(concatenated_states.shape)
     return compute_function(concatenated_states, **kwargs)
 
 
@@ -164,13 +174,14 @@ def calculate_and_save_layerwise_metrics(
     model_specs: BaseModelSpecifications,
     evaluation_metric_specs: EvaluationMetricSpecifications,
     dataloader_kwargs: Dict[str, Any],
+    should_save_results: bool = True
 ):
     if evaluation_metric_specs.evaluation_metric == 'entropy':
         compute_func_kwargs = {
             'alpha': evaluation_metric_specs.alpha,
             'normalizations': evaluation_metric_specs.normalizations
         }
-        forward_pass_func = compute_per_forward_pass if evaluation_metric_specs.granularity == 'sentence' else compute_on_concatenated_passes
+        forward_pass_func = compute_per_forward_pass if evaluation_metric_specs.granularity == 'prompt' else compute_on_concatenated_passes
   
 
     elif evaluation_metric_specs.evaluation_metric == 'curvature':
@@ -204,9 +215,10 @@ def calculate_and_save_layerwise_metrics(
         forward_pass_func = compute_per_forward_pass
 
     compute_func = metric_name_to_function[evaluation_metric_specs.evaluation_metric]
-    results = forward_pass_func(model, dataloader, dataloader_kwargs['num_samples'], compute_func, **compute_func_kwargs)
+    results = forward_pass_func(model, dataloader, compute_func, **compute_func_kwargs)
 
-    from ..misc.results_saving import save_results # here to avoid circular imports
-    save_results(results, model_specs, evaluation_metric_specs, dataloader_kwargs)
+    if should_save_results:
+        from ..misc.results_saving import save_results # here to avoid circular imports
+        save_results(results, model_specs, evaluation_metric_specs, dataloader_kwargs)
 
     return results

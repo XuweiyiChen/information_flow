@@ -83,8 +83,10 @@ class BaseLayerwiseAutoModelWrapper:
             return {'device': self.model.device}
         elif hasattr(self.model, 'device'):
             return {'device': self.model.device}
+        elif hasattr(self.model, 'model') and hasattr(self.model.model, 'device'):
+            return {'device': self.model.model.device}
         else:
-            raise ValueError("Could not find hf_device_map")
+            return {'device': 'cuda:0'} #pray
     
     def _get_first_layer_device(self):
         device_map = self._get_hf_device_map()

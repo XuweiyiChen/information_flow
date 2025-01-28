@@ -223,7 +223,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     
     @torch.no_grad()
     def _encode_helper(self, dataloader, verbose=False, return_raw_hidden_states=False, **kwargs) -> np.ndarray:
-        pooling_method = kwargs.pop("pooling_method", "first_hidden_state")
+        pooling_method = kwargs.pop("pooling_method", "mean")
         encoded_batches = []
         layerwise_encoded_batches = []
 
@@ -237,6 +237,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             outputs = self.forward(**batch)
 
             hidden_states = outputs.hidden_states[self.evaluation_layer_idx]
+            
             hidden_states = self._get_pooled_hidden_states(hidden_states, batch["attention_mask"], method=pooling_method)
             encoded_batches.append(hidden_states.float().cpu())
 
@@ -273,7 +274,10 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return encodings
     
     @torch.no_grad()
-    def _get_pooled_hidden_states(self, hidden_states, attention_mask, method="mean"):
+    def _get_pooled_hidden_states(self, hidden_states, attention_mask=None, method="mean"):
+        if attention_mask is None:
+            attention_mask = torch.ones_like(hidden_states[0])
+
         if method == "mean":
             seq_lengths = attention_mask.sum(dim=-1)
             return torch.stack(

@@ -205,7 +205,8 @@ def compute_entropy(hidden_states, alpha=1, normalizations=['maxEntropy']):
     entropies = []
     for layer_cov in cov:
         try:
-            entropies.append(itl.matrixAlphaEntropy(layer_cov.double(), alpha=alpha).item())
+            layer_cov = layer_cov.double() / torch.trace(layer_cov.double())
+            entropies.append(itl.matrixAlphaEntropy(layer_cov, alpha=alpha).item())
         except Exception as e:
             entropies.append(np.nan)
 
