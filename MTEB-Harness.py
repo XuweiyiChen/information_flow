@@ -36,7 +36,7 @@ def run_entropy_metrics(
 ):
     task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
     metrics = ['prompt-entropy', 'dataset-entropy', 'infonce', 'dime', 'lidar',  'curvature']
-    splits = ['train', 'test']
+    splits = ['test']
 
     if model_specs.model_family in ["bert", "roberta"]:
         max_sample_length = 512
@@ -55,7 +55,7 @@ def run_entropy_metrics(
             dataloader_kwargs = {
                 'dataset_name': task_dataset,
                 'split': split,
-                'num_samples': 10000,
+                'num_samples': 1000,
                 'batch_size': optimal_batch_size,
                 'max_sample_length': max_sample_length
             }
