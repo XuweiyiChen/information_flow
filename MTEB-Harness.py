@@ -70,7 +70,7 @@ def run_entropy_metrics(
             )
             if os.path.exists(results_path):
                 print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
-                #continue
+                continue
 
             # Get the dataloader. Depending on the metric, might need augmentations
             if metric in ['prompt-entropy', 'dataset-entropy', 'curvature']:
