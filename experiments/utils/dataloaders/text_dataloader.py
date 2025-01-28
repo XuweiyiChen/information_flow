@@ -15,6 +15,18 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 datasets = ['wikitext', 'ai-medical-dataset']
 
+def find_data_key_in_examples(examples):
+    if "text" in examples:
+        return "text"
+    elif "sentences" in examples:
+        return "sentences"
+    elif "query" in examples:
+        return "query"
+    elif "sentence1" in examples and "sentence2" in examples:
+        return "sentence1"
+    else:
+        raise ValueError("No text or sentences column found in examples, valid columns: ", examples.keys())
+        
 def get_dataloader(
         tokenizer, 
         dataset_name, 
@@ -30,18 +42,6 @@ def get_dataloader(
         num_workers=8,
         batch_size=1
     ):
-    
-    def find_data_key_in_examples(examples):
-        if "text" in examples:
-            return "text"
-        elif "sentences" in examples:
-            return "sentences"
-        elif "query" in examples:
-            return "query"
-        elif "sentence1" in examples and "sentence2" in examples:
-            return "sentence1"
-        else:
-            raise ValueError("No text or sentences column found in examples, valid columns: ", examples.keys())
 
     def general_tokenize_function(examples):
         data_key = find_data_key_in_examples(examples)
@@ -190,7 +190,8 @@ def multiview_collate(batch, tokenizer, max_sample_length=2048, num_views=8):
         augmented_batch = []
         for item in batch:
             # Get text from input_ids
-            text = item['text']
+            data_key = find_data_key_in_examples(item)
+            text = item[data_key]
             # Augment single text
             augmented_text = text_augmentation([text], num_augmentations_per_sample=1)[0]
             # Tokenize back
