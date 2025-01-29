@@ -103,20 +103,12 @@ def compute_infonce(hidden_states, temperature=0.1):
     L, NUM_AUG, NUM_SAMPLES, D = hidden_states.shape
     assert NUM_AUG == 2
 
-    def calculate_infonce(view_a, view_b):  
-        # adapted from solo-learn SIMCLR implementation
-        Z = torch.cat([view_a, view_b], dim=0)
-        indices = torch.arange(NUM_SAMPLES).repeat(NUM_AUG).unsqueeze(0).to(view_a.device)
-        sim = torch.exp(torch.einsum("if, jf -> ij", Z, Z) / temperature)
+    def calculate_infonce(view_a, view_b):
+        logits = view_a @ view_b.T
 
-        pos_mask = indices.t() == indices
-        pos_mask.fill_diagonal_(0)
-        neg_mask = indices.t() != indices
+        labels = torch.arange(len(view_a), device=view_a.device)
 
-        pos = torch.sum(sim * pos_mask, 1)
-        neg = torch.sum(sim * neg_mask, 1)
-        loss = -(torch.mean(torch.log(pos / (pos + neg))))
-        return loss.item()
+        return torch.nn.functional.cross_entropy(logits / temperature, labels, reduction='mean').item()
 
     embeddings_A = [embeddings[0].double() for embeddings in hidden_states]
     embeddings_B = [embeddings[1].double() for embeddings in hidden_states]  
@@ -126,7 +118,9 @@ def compute_infonce(hidden_states, temperature=0.1):
         for idx in range(L)
     ]
 
-    return {'raw': infonce_scores}
+    normalized_infonce_scores = [1 - (x / math.log(NUM_SAMPLES)) for x in infonce_scores]
+
+    return {'raw': infonce_scores, 'mi-lower-bound': normalized_infonce_scores}
 
 
 def compute_curvature(hidden_states, k=1):
