@@ -5,7 +5,7 @@ frozenlist==1.4.1
 ipykernel==6.29.3
 ipython==8.24.0
 llm2vec==0.2.2
-mamba-ssm==2.2.2
+# mamba-ssm==2.2.2
 matplotlib==3.8.4
 mteb==1.14.19
 networkx==3.3
@@ -20,3 +20,6 @@ torchsummary==1.5.1
 tqdm==4.66.4
 transformers==4.40.2
 umap-learn==0.5.6
+timm==1.0.11
+omegaconf
+git+https://git@github.com/apple/ml-aim.git@main#subdirectory=aim-v1

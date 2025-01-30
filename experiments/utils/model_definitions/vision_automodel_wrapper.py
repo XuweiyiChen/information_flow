@@ -9,7 +9,6 @@ from torchvision import transforms
 from typing import Any, List
 import tqdm
 from aim.v1.torch.models import AIMForImageClassification
-from aim.v1.utils import load_pretrained
 from aim.v1.torch.data import val_transforms
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
@@ -125,11 +124,16 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             self.setup_timm_model()
         elif self.model_specs.model_family == 'i-jepa':
             self.setup_jepa_model()
+        elif self.model_specs.model_family == 'aim':
+            self.setup_aim_model()
         else:
             self.setup_huggingface_model()
 
     def setup_jepa_model(self):
         self.model = load_jepa_encoder(self.model_specs.model_size)
+
+    def setup_aim_model(self):
+        self.model = AIMForImageClassification.from_pretrained(self.model_path, revision=self.model_specs.revision)
 
     def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)

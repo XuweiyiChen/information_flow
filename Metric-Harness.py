@@ -6,10 +6,11 @@ import os
 import matplotlib.pyplot as plt
 from experiments.utils.model_definitions.text_automodel_wrapper import TextLayerwiseAutoModelWrapper, TextModelSpecifications
 from experiments.utils.model_definitions.vision_automodel_wrapper import VisionLayerwiseAutoModelWrapper, VisionModelSpecifications
-from experiments.utils.dataloaders.vision_dataloader import prepare_datasets, prepare_dataloader, validation_imagenet_transform, simclr_imagenet_transform
+from experiments.utils.dataloaders.vision_dataloader import prepare_datasets, prepare_dataloader, validation_imagenet_transform, simclr_imagenet_transform, ImageDatasetFromDirectory
 from experiments.utils.misc.results_saving import construct_file_path, load_results, check_if_results_exist
 from experiments.utils.metrics.metric_calling import EvaluationMetricSpecifications, calculate_and_save_layerwise_metrics
 from experiments.utils.misc.optimal_batch_size import find_optimal_batch_size
+from aim.v1.torch.data import val_transforms
 
 models_to_try = [
     # VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),
@@ -46,7 +47,6 @@ models_to_try = [
 #         revision="main"
 #     )
 # ]
-
 
 metrics_to_try = [
     EvaluationMetricSpecifications(evaluation_metric="prompt-entropy", alpha=1),
@@ -89,12 +89,17 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
         image_transform = validation_imagenet_transform()
         is_multiview = False
 
-    validation_imagenet_dataset = prepare_datasets(
-        dataset="imagenet", 
-        transform=image_transform,
-        # train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
-        train_dataset_path="/home/mila/a/arefinmr/scratch/LLM/information_flow/VisionCausal/data",
-        number_of_samples=dataloader_kwargs["num_samples"]
+    # validation_imagenet_dataset = prepare_datasets(
+    #     dataset="imagenet", 
+    #     transform=image_transform,
+    #     train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+    #     number_of_samples=dataloader_kwargs["num_samples"]
+    # )
+
+    validation_imagenet_dataset = ImageDatasetFromDirectory(
+        directory="/home/mila/a/arefinmr/scratch/LLM/information_flow/VisionCausal/data",
+        transform=val_transforms(),
+        n=dataloader_kwargs["num_samples"]
     )
 
     optimal_batch_size = find_optimal_batch_size(model, len(validation_imagenet_dataset), device=model.device)

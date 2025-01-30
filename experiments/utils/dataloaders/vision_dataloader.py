@@ -65,6 +65,31 @@ class CustomDatasetWithoutLabels(Dataset):
 
     def __len__(self):
         return len(self.images)
+    
+
+class ImageDatasetFromDirectory(Dataset):
+    def __init__(self, directory, transform=None, n=None):
+        """
+        Args:
+            directory (str): Path to the image directory.
+            transform (callable, optional): A function/transform to apply to the images.
+            n (int, optional): Number of images to load. Loads all images if None.
+        """
+        self.directory = directory
+        self.transform = transform
+        self.image_paths = sorted([os.path.join(directory, f) for f in os.listdir(directory) if f.lower().endswith(('png', 'jpg', 'jpeg'))])
+        if n is not None:
+            self.image_paths = self.image_paths[:n]
+    
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        image_path = self.image_paths[idx]
+        image = Image.open(image_path).convert("RGB")  # Ensure 3-channel RGB
+        if self.transform:
+            image = self.transform(image)
+        return image
 
 
 class GaussianBlur:
