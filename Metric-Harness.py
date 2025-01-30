@@ -12,26 +12,31 @@ from experiments.utils.metrics.metric_calling import EvaluationMetricSpecificati
 from experiments.utils.misc.optimal_batch_size import find_optimal_batch_size
 
 models_to_try = [
-    VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),
-    VisionModelSpecifications(model_family="beit", model_size="large", revision="main"),
-    #VisionModelSpecifications(model_family="dinov2", model_size="small", revision="main"),
-    VisionModelSpecifications(model_family="dinov2", model_size="base", revision="main"),
-    VisionModelSpecifications(model_family="dinov2", model_size="large", revision="main"),
-    #VisionModelSpecifications(model_family="dinov2", model_size="giant", revision="main"),
-    # VisionModelSpecifications(model_family="dinov2-register", model_size="small", revision="main"),
-    # VisionModelSpecifications(model_family="dinov2-register", model_size="base", revision="main"),
-    # VisionModelSpecifications(model_family="dinov2-register", model_size="large", revision="main"),
-    # VisionModelSpecifications(model_family="dinov2-register", model_size="giant", revision="main"),
-    VisionModelSpecifications(model_family="mae", model_size="base", revision="main"),
-    VisionModelSpecifications(model_family="mae", model_size="large", revision="main"),
-    #VisionModelSpecifications(model_family="mae", model_size="huge", revision="main"),
-    VisionModelSpecifications(model_family="clip", model_size="base", revision="main"),
-    VisionModelSpecifications(model_family="clip", model_size="large", revision="main"),
-    VisionModelSpecifications(model_family="vit", model_size="base", revision="main"),
-    VisionModelSpecifications(model_family="vit", model_size="large", revision="main"),
-    #VisionModelSpecifications(model_family="vit", model_size="huge", revision="main"),
-    VisionModelSpecifications(model_family="i-jepa", model_size="imagenet1k", revision="main"),
-    VisionModelSpecifications(model_family="i-jepa", model_size="imagenet21k", revision="main"),
+    # VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="beit", model_size="large", revision="main"),
+    # #VisionModelSpecifications(model_family="dinov2", model_size="small", revision="main"),
+    # VisionModelSpecifications(model_family="dinov2", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="dinov2", model_size="large", revision="main"),
+    # #VisionModelSpecifications(model_family="dinov2", model_size="giant", revision="main"),
+    # # VisionModelSpecifications(model_family="dinov2-register", model_size="small", revision="main"),
+    # # VisionModelSpecifications(model_family="dinov2-register", model_size="base", revision="main"),
+    # # VisionModelSpecifications(model_family="dinov2-register", model_size="large", revision="main"),
+    # # VisionModelSpecifications(model_family="dinov2-register", model_size="giant", revision="main"),
+    # VisionModelSpecifications(model_family="mae", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="mae", model_size="large", revision="main"),
+    # #VisionModelSpecifications(model_family="mae", model_size="huge", revision="main"),
+    # VisionModelSpecifications(model_family="clip", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="clip", model_size="large", revision="main"),
+    # VisionModelSpecifications(model_family="vit", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="vit", model_size="large", revision="main"),
+    # #VisionModelSpecifications(model_family="vit", model_size="huge", revision="main"),
+    # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet1k", revision="main"),
+    # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet21k", revision="main"),
+
+    # VisionModelSpecifications(model_family="aim", model_size="600M", revision="main"),
+    VisionModelSpecifications(model_family="aim", model_size="1B", revision="main"),
+    VisionModelSpecifications(model_family="aim", model_size="3B", revision="main"),
+    # VisionModelSpecifications(model_family="aim", model_size="7B", revision="main"),
 ]   
 
 # models_to_try = [
@@ -87,7 +92,8 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
     validation_imagenet_dataset = prepare_datasets(
         dataset="imagenet", 
         transform=image_transform,
-        train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+        # train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+        train_dataset_path="/home/mila/a/arefinmr/scratch/LLM/information_flow/VisionCausal/data",
         number_of_samples=dataloader_kwargs["num_samples"]
     )
 

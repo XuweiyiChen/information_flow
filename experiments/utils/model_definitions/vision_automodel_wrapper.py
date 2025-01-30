@@ -8,6 +8,9 @@ from torch.utils.data import Subset
 from torchvision import transforms
 from typing import Any, List
 import tqdm
+from aim.v1.torch.models import AIMForImageClassification
+from aim.v1.utils import load_pretrained
+from aim.v1.torch.data import val_transforms
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from .jepa.JepaEncoder import load_jepa_encoder
@@ -25,6 +28,7 @@ model_name_to_sizes = {
     'clip': ['base', 'large'],
     'i-jepa': ['imagenet1k', 'imagenet21k'],
     'beit': ['base', 'large'],
+    'aim': ['600M', '1B', '3B', '7B']
 }
 model_types = list(model_name_to_sizes.keys())
 
@@ -60,6 +64,8 @@ def get_model_path(name, size):
         return ""
     elif name == 'beit':
         return f"microsoft/beit-{size}-patch16-224"
+    elif name == 'aim':
+        return f"apple/aim-{size}"
 
 def update_config(config, model_specs):
     if model_specs.model_family == 'mae':
@@ -70,6 +76,8 @@ def update_config(config, model_specs):
 def get_model_and_config_classes(model_specs):
     if model_specs.model_family == 'clip':
         return CLIPVisionModel, CLIPVisionConfig
+    elif model_specs.model_family == 'aim':
+        return AIMForImageClassification, None
     else:
         return AutoModel, AutoConfig
 
@@ -99,6 +107,8 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
            self.image_processor = timm.data.create_transform(**data_config, is_training=False)
         elif self.model_specs.model_family == 'i-jepa':
             self.image_processor = lambda x: x
+        elif self.model_specs.model_family == 'aim':
+            self.image_processor = val_transforms()
         else:
             self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
 
@@ -123,10 +133,13 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
 
     def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
-        self.config = CONFIG_CLASS.from_pretrained(self.model_path, 
+        if CONFIG_CLASS is None:
+            self.config = None
+        else:
+            self.config = CONFIG_CLASS.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
                                             output_hidden_states=True)
-        self.config = update_config(self.config, self.model_specs)
+            self.config = update_config(self.config, self.model_specs)
         #self.num_layers = self.config.num_hidden_layers + 1 
         #self.update_evaluation_layer(self.evaluation_layer_idx)
         #self.config.num_hidden_layers = self.evaluation_layer_idx
