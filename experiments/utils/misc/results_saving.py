@@ -54,9 +54,10 @@ def check_if_results_exist(
 def load_results(
         model_specs: BaseModelSpecifications, 
         evaluation_metric_specs: EvaluationMetricSpecifications, 
-        dataloader_kwargs: Dict[str, Any]
+        dataloader_kwargs: Dict[str, Any],
+        base_path: str = 'experiments/results'
 ):
-    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs)
+    file_path = construct_file_path(model_specs, evaluation_metric_specs, dataloader_kwargs, base_path=base_path)
 
     try:
         with open(file_path, "rb") as f:
@@ -66,15 +67,27 @@ def load_results(
         print(f"File not found: {file_path}")
         return None
 
-def load_results_for_model_and_revisions(model_family, model_size, revisions, evaluation_metrics):
+def load_results_for_model_and_revisions(model_family, model_size, revisions, evaluation_metrics, base_path='experiments/results'):
     results = {}
     for revision in revisions:
-        model_specs = BaseModelSpecifications(model_family, model_size, revision)
+        model_specs = BaseModelSpecifications(model_family, model_size, revision, ignore_checks=True)
         for evaluation_metric in evaluation_metrics:
             evaluation_metric_specs = EvaluationMetricSpecifications(evaluation_metric)
-            dataloader_kwargs = {'dataset_name': 'wikitext'}
-            results[(revision, evaluation_metric)] = load_results(model_specs, evaluation_metric_specs, dataloader_kwargs)
+            dataloader_kwargs = {'dataset_name': 'wikitext/train'}
+            results[(revision, evaluation_metric)] = load_results(model_specs, evaluation_metric_specs, dataloader_kwargs, base_path=base_path)
     return results
+
+def adjust_infonce_scores(result, model_family):
+    dimensionalities = {
+        'bert': 768,
+        'roberta': 768,
+        'mamba': 1024,
+        'Pythia': 1024
+    }
+    upper_bound = np.log(dimensionalities[model_family])
+
+    return 1 - result / upper_bound
+    
 
 def load_all_results(
         should_normalize_scores_across_models: bool = False,
@@ -167,7 +180,7 @@ def load_all_results(
 
                             # load metrics
                             metrics_path = os.path.join(revision_path, "metrics", "mteb")
-                
+                            
                             if os.path.isdir(metrics_path):
                                 for dataset in os.listdir(metrics_path):
                                     dataset_path = os.path.join(metrics_path,  dataset, "test")
@@ -190,13 +203,16 @@ def load_all_results(
                                                                 if not metric_name in all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name]:
                                                                     all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name] = {}
                                                                 all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name][metric_normalization] = metric_value
+
+                                                                if metric_name == 'infonce':
+                                                                    all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name]['fixed'] = adjust_infonce_scores(metric_value, model_family)
                                                             except Exception as e:
                                                                 #print(f"Error: {e}", model_family, model_size, revision, f"layer_{layer}", correct_task_name, metric_name, metric_normalization, metric_value)
                                                                 pass
 
                             # load wikitext metrics
-                            metrics_path = os.path.join(revision_path, "metrics", "wikitext")
-                
+                            metrics_path = os.path.join(revision_path, "metrics", "wikitext/train")
+
                             if os.path.isdir(metrics_path):
                                 for metric_file in os.listdir(metrics_path):
                                     if metric_file.endswith('.pkl'):
@@ -211,14 +227,17 @@ def load_all_results(
                                             for layer, metric_value in enumerate(metric_values):
                                                 correct_task_name = 'wikitext'
                                                 try:
+                                                    if f"layer_{layer}" not in all_results[model_family][model_size][revision]:
+                                                        all_results[model_family][model_size][revision][f"layer_{layer}"] = {}
                                                     if not correct_task_name in all_results[model_family][model_size][revision][f"layer_{layer}"]:
                                                         all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name] = {}
 
                                                     if not metric_name in all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name]:
                                                         all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name] = {}
                                                     all_results[model_family][model_size][revision][f"layer_{layer}"][correct_task_name][metric_name][metric_normalization] = metric_value
+                                                
                                                 except Exception as e:
-                                                    # raise e
+                                                    raise e
                                                     # print(f"Error: {e}", model_family, model_size, revision, f"layer_{layer}", correct_task_name, metric_name, metric_normalization, metric_value)
                                                     pass
 

@@ -18,8 +18,8 @@ logging.set_verbosity_error()
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_family', type=str, default='Pythia')
-    parser.add_argument('--model_size', type=str, default='14m')
+    parser.add_argument('--model_family', type=str, default='mamba')
+    parser.add_argument('--model_size', type=str, default='370m')
     parser.add_argument('--revision', type=str, default='main')
     parser.add_argument('--evaluation_layer', type=int, default=-1, help='Layer to use for evaluation. -1 for the final layer. This is 0-indexed.')
     parser.add_argument('--base_results_path', type=str, default='experiments/results')
@@ -36,6 +36,7 @@ def run_entropy_metrics(
 ):
     
     metrics = ['prompt-entropy', 'dataset-entropy', 'infonce', 'dime', 'lidar',  'curvature']
+    #metrics = ['infonce']
 
     if args.purpose == 'run_wikitext_metrics':
         task_datasets = ['wikitext']
@@ -43,16 +44,16 @@ def run_entropy_metrics(
     else:
         task_datasets = [task.metadata.dataset['path'] for task in MTEB_evaluator.tasks]
         task_datasets += ['wikitext']
-    splits = ['test']
-
+        splits = ['test']
+        
     if model_specs.model_family in ["bert", "roberta"]:
         max_sample_length = 512
     else:
         max_sample_length = 2048
 
     # get maximum batch size for the model
-    optimal_batch_size = find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=max_sample_length)//2
-    print(f"Optimal batch size: {optimal_batch_size}")
+    #optimal_batch_size = max(1, find_optimal_batch_size(model, 10000, device=model.device, max_sentence_length=max_sample_length)//2)
+    #print(f"Optimal batch size: {optimal_batch_size}")
 
     for task_dataset, metric, split in product(task_datasets, metrics, splits):
         try:
@@ -63,7 +64,7 @@ def run_entropy_metrics(
                 'dataset_name': task_dataset,
                 'split': split,
                 'num_samples': 1000,
-                'batch_size': optimal_batch_size,
+                'batch_size': 2,
                 'max_sample_length': max_sample_length
             }
 
@@ -77,7 +78,7 @@ def run_entropy_metrics(
             )
             if os.path.exists(results_path):
                 print(f"Results already exist for {task_dataset} - {metric} - {split}. Skipping...")
-                continue
+                #continue
 
             # Get the dataloader. Depending on the metric, might need augmentations
             if metric in ['prompt-entropy', 'dataset-entropy', 'curvature']:
@@ -134,7 +135,7 @@ def main():
             output_folder.mkdir(parents=True, exist_ok=True)
             return output_folder
         
-        encoding_kwargs = {'verbose': False}
+        encoding_kwargs = {'verbose': True}
         evaluator.create_output_folder = custom_create_output_folder
         evaluator.run(model, 
                       kwargs=encoding_kwargs, 

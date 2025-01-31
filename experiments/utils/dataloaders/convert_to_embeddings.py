@@ -11,7 +11,7 @@ def convert_image_dataset_to_embeddings(dataloader, model, save_path):
         model.model.eval()
 
         for batch in tqdm.tqdm(dataloader, desc=f"Converting set to embeddings"):
-            x, y = model.prepare_inputs(batch)
+            x, y = model.prepare_inputs(batch, return_labels=True)
             outputs = model(**x)
             
             if hasattr(outputs, 'hidden_states'):
@@ -23,7 +23,7 @@ def convert_image_dataset_to_embeddings(dataloader, model, save_path):
             
             layerwise_feats = []
             for layer in hidden_states:
-                pooled_feats = model._get_pooled_hidden_states(layer, method="mean") # [batch_size, hidden_size]
+                pooled_feats = model._get_pooled_hidden_states(layer, None, method="mean") # [batch_size, hidden_size]
                 layerwise_feats.append(pooled_feats.cpu().half().detach().squeeze().numpy())
             
             layerwise_feats = np.array(layerwise_feats).swapaxes(0, 1)

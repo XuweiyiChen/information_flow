@@ -100,3 +100,4 @@ for model_spec in models_to_try:
         #raise e
         print(f"Error with {model_spec}")
         print(e)
+        raise e
