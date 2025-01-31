@@ -179,7 +179,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         if isinstance(images, BatchFeature):
             inputs = images.to("cuda")
             inputs['pixel_values'] = inputs['pixel_values'].squeeze(1).to(self.dtype)
-        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa':
+        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa' or self.model_specs.model_family == 'aim':
             inputs = {
                 "x": images.to("cuda").to(self.dtype)
             }

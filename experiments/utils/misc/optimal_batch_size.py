@@ -28,7 +28,7 @@ def find_optimal_batch_size(model, number_of_samples, device, batch_size=512, ma
         garbage_collect_cuda()
         try:
             if isinstance(model, VisionLayerwiseAutoModelWrapper):
-                if model.model_specs.model_family == 'i-jepa':
+                if model.model_specs.model_family == 'i-jepa' or model.model_specs.model_family == 'aim':
                     worst_case_batch = {
                         "x": torch.ones((batch_size, 3, 224, 224), dtype=model.dtype).to(device),
                     }
