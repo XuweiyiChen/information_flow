@@ -1,0 +1,50 @@
+processing layer 32
+Running evaluation for LLM2Vec-mntp 8B main layer 32
+─────────────────────────────── Selected tasks  ────────────────────────────────
+PairClassification
+    - SprintDuplicateQuestions, s2s
+    - TwitterSemEval2015, s2s
+    - TwitterURLCorpus, s2s
+
+
+Classification
+    - AmazonCounterfactualClassification, s2s, multilingual 2 / 4 Subsets
+    - AmazonReviewsClassification, s2s, multilingual 1 / 6 Subsets
+    - Banking77Classification, s2s
+    - EmotionClassification, s2s
+    - MTOPDomainClassification, s2s, multilingual 1 / 6 Subsets
+    - MTOPIntentClassification, s2s, multilingual 1 / 6 Subsets
+    - MassiveIntentClassification, s2s, multilingual 1 / 51 Subsets
+    - MassiveScenarioClassification, s2s, multilingual 1 / 51 Subsets
+    - ToxicConversationsClassification, s2s
+    - TweetSentimentExtractionClassification, s2s
+
+
+Clustering
+    - ArxivClusteringS2S, s2s
+    - BiorxivClusteringS2S, s2s
+    - MedrxivClusteringS2S, s2s
+    - RedditClustering, s2s
+    - StackExchangeClustering, s2s
+    - TwentyNewsgroupsClustering, s2s
+
+
+Reranking
+    - AskUbuntuDupQuestions, s2s
+    - MindSmallReranking, s2s
+    - SciDocsRR, s2s
+    - StackOverflowDupQuestions, s2s
+
+
+STS
+    - BIOSSES, s2s
+    - SICK-R, s2s
+    - STS12, s2s
+    - STS13, s2s
+    - STS14, s2s
+    - STS15, s2s
+    - STS16, s2s
+    - STS17, s2s, multilingual 8 / 11 Subsets
+    - STSBenchmark, s2s
+
+

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=llm2vec-mntp-mteb-lastlay
-#SBATCH --time=32:00:00
+#SBATCH --time=8:00:00
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=20
 #SBATCH --ntasks=1
@@ -20,7 +20,8 @@ SINGULARITY_IMAGE="/scratch/work/public/singularity/cuda11.8.86-cudnn8.7-devel-u
 
 MODEL_NAME="LLM2Vec-mntp"
 MAX_LAYER=32
-MIN_LAYER=16
+#MIN_LAYER=16
+MIN_LAYER=32
 REVISION="main"
 SIZE="8B"
 
