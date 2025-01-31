@@ -5,7 +5,7 @@ USE_SLURM=0
 MODEL_NAME="bert"
 MODEL_SIZES=('base' 'large')
 REVISION="main"
-PURPOSE="run_entropy_metrics"
+PURPOSE="run_wikitext_metrics"
 
 for size in ${MODEL_SIZES[@]}; do
     echo "Running evaluation for $MODEL_NAME $size"
@@ -13,6 +13,6 @@ for size in ${MODEL_SIZES[@]}; do
         --model_family $MODEL_NAME \
         --model_size $size \
         --revision $REVISION \
-        --purpose run_entropy_metrics \
+        --purpose $PURPOSE \
 
 done

@@ -1,9 +1,9 @@
 #!/bin/bash
-USE_SLURM=1
+USE_SLURM=0
 MODEL_NAME="mamba"
-MODEL_SIZES=('130m' '370m' '790m')
+MODEL_SIZES=('370m')
 REVISION="main"
-PURPOSE="run_entropy_metrics"
+PURPOSE="run_wikitext_metrics"
 
 for size in ${MODEL_SIZES[@]}; do
     if [ $USE_SLURM -eq 1 ]; then

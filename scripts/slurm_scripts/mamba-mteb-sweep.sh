@@ -1,13 +1,13 @@
 #!/bin/bash
-USE_SLURM=1
+USE_SLURM=0
 
 MODEL_NAME="mamba"
-MODEL_SIZES=('130m' '370m' '790m')
+MODEL_SIZES=('370m')
 MAX_LAYER=50
 REVISION="main"
 PURPOSE="run_tasks"
 for size in ${MODEL_SIZES[@]}; do
-    for layer in $(seq 0 $MAX_LAYER); do
+    for layer in $(seq 14 $MAX_LAYER); do
         if [ $USE_SLURM -eq 1 ]; then
             sbatch slurm_submit.sh \
                 --model_family $MODEL_NAME \

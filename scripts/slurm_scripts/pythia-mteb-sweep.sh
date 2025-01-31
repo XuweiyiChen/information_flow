@@ -5,7 +5,7 @@ MODEL_NAME="Pythia"
 MODEL_SIZES=('410m')
 MAX_LAYER=50
 REVISION="main"
-PURPOSE="run_tasks"
+PURPOSE="run_wikitext_metrics"
 
 for size in ${MODEL_SIZES[@]}; do
     for layer in $(seq 0 $MAX_LAYER); do

@@ -92,7 +92,7 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
     # validation_imagenet_dataset = prepare_datasets(
     #     dataset="imagenet", 
     #     transform=image_transform,
-    #     train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+    #     train_data_path="/home/AD/$user/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
     #     number_of_samples=dataloader_kwargs["num_samples"]
     # )
 

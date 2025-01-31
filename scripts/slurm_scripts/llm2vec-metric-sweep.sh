@@ -5,7 +5,7 @@ USE_SLURM=0
 MODEL_NAME="LLM2Vec-mntp"
 MODEL_SIZE='8B'
 REVISION="main"
-PURPOSE="run_entropy_metrics"
+PURPOSE="run_wikitext_metrics"
 
 if [ $USE_SLURM -eq 1 ]; then
     sbatch -J $JOBNAME slurm_submit.sh \
