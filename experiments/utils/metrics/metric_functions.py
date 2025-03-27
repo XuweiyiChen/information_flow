@@ -231,15 +231,15 @@ def compute_LDA_matrix(augmented_prompt_tensors, return_within_class_scatter=Fal
     between_class_scatter = torch.zeros((D, D)).to(augmented_prompt_tensors.device)
     for i in range(NUM_SAMPLES):
         between_class_scatter += torch.outer(class_means[i] - dataset_mean, class_means[i] - dataset_mean)
-    between_class_scatter /= NUM_SAMPLES
+    between_class_scatter /= NUM_SAMPLES # D x D
 
     # Equation 2 in LIDAR paper
     within_class_scatter = torch.zeros((D, D)).to(augmented_prompt_tensors.device)
     for i in range(NUM_SAMPLES):
         for j in range(NUM_AUGMENTATIONS):
             within_class_scatter += torch.outer(augmented_prompt_tensors[i, j] - class_means[i], augmented_prompt_tensors[i, j] - class_means[i])
-    within_class_scatter /= (NUM_SAMPLES * NUM_AUGMENTATIONS)
-    within_class_scatter += delta * torch.eye(D).to(augmented_prompt_tensors.device)
+    within_class_scatter /= (NUM_SAMPLES * NUM_AUGMENTATIONS) # D x D
+    within_class_scatter += delta * torch.eye(D).to(augmented_prompt_tensors.device) # D x D
 
     if return_within_class_scatter:
         return within_class_scatter 
@@ -248,7 +248,7 @@ def compute_LDA_matrix(augmented_prompt_tensors, return_within_class_scatter=Fal
     eigs, eigvecs = torch.linalg.eigh(within_class_scatter)
     within_sqrt = torch.diag(eigs**(-0.5))
     fractional_inverse = eigvecs @ within_sqrt @ eigvecs.T
-    LDA_matrix = fractional_inverse @ between_class_scatter @ fractional_inverse
+    LDA_matrix = fractional_inverse @ between_class_scatter @ fractional_inverse # D x D
 
     return LDA_matrix
 

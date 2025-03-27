@@ -54,7 +54,7 @@ models_to_try = [
     # VisionModelSpecifications(model_family="vit", model_size="base", revision="main"),
 
     # Small models
-    VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),
+    # VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),
     # VisionModelSpecifications(model_family="dinov2-register", model_size="small", revision="main"),
     
     # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet1k", revision="main"),
@@ -72,6 +72,11 @@ models_to_try = [
     # VisionModelSpecifications(model_family="vit", model_size="large", revision="main"),
     # VisionModelSpecifications(model_family="vit", model_size="huge", revision="main"),
     # VisionModelSpecifications(model_family="dinov2", model_size="giant", revision="main"),
+
+    VisionModelSpecifications(model_family="aim", model_size="large", revision="main"),
+    # VisionModelSpecifications(model_family="aim", model_size="huge", revision="main"),
+    # VisionModelSpecifications(model_family="aim", model_size="1B", revision="main"),
+    # VisionModelSpecifications(model_family="aim", model_size="3B", revision="main"),
 ]   
 
 for model_spec in models_to_try:
@@ -80,7 +85,7 @@ for model_spec in models_to_try:
         save_path = f"embeddings/{model_spec.model_family}/{model_spec.model_size}/imagenet"
         backbone = VisionLayerwiseAutoModelWrapper(model_specs=model_spec)
 
-        optimal_batch_size = find_optimal_batch_size(backbone, 256, device="cuda:0")
+        optimal_batch_size = find_optimal_batch_size(backbone, 256, device=model_spec._get_first_layer_device())
         print(model_spec)
         print(f"Optimal batch size: {optimal_batch_size}")
 
@@ -100,3 +105,4 @@ for model_spec in models_to_try:
         #raise e
         print(f"Error with {model_spec}")
         print(e)
+        raise e

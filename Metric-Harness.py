@@ -10,7 +10,6 @@ from experiments.utils.dataloaders.vision_dataloader import prepare_datasets, pr
 from experiments.utils.misc.results_saving import construct_file_path, load_results, check_if_results_exist
 from experiments.utils.metrics.metric_calling import EvaluationMetricSpecifications, calculate_and_save_layerwise_metrics
 from experiments.utils.misc.optimal_batch_size import find_optimal_batch_size
-from aim.v1.torch.data import val_transforms
 
 models_to_try = [
     # VisionModelSpecifications(model_family="beit", model_size="base", revision="main"),

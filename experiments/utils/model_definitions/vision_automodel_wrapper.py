@@ -8,8 +8,6 @@ from torch.utils.data import Subset
 from torchvision import transforms
 from typing import Any, List
 import tqdm
-from aim.v1.torch.models import AIMForImageClassification
-from aim.v1.torch.data import val_transforms
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from .jepa.JepaEncoder import load_jepa_encoder
@@ -27,7 +25,7 @@ model_name_to_sizes = {
     'clip': ['base', 'large'],
     'i-jepa': ['imagenet1k', 'imagenet21k'],
     'beit': ['base', 'large'],
-    'aim': ['600M', '1B', '3B', '7B']
+    'aim': ['large', 'huge', '1B', '3B']  # large is 300M, huge is 600M
 }
 model_types = list(model_name_to_sizes.keys())
 
@@ -64,7 +62,7 @@ def get_model_path(name, size):
     elif name == 'beit':
         return f"microsoft/beit-{size}-patch16-224"
     elif name == 'aim':
-        return f"apple/aim-{size}"
+        return f"apple/aimv2-{size}-patch14-224"
 
 def update_config(config, model_specs):
     if model_specs.model_family == 'mae':
@@ -75,11 +73,8 @@ def update_config(config, model_specs):
 def get_model_and_config_classes(model_specs):
     if model_specs.model_family == 'clip':
         return CLIPVisionModel, CLIPVisionConfig
-    elif model_specs.model_family == 'aim':
-        return AIMForImageClassification, None
     else:
         return AutoModel, AutoConfig
-
 
 
 class VisionModelSpecifications(BaseModelSpecifications):
@@ -106,10 +101,8 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
            self.image_processor = timm.data.create_transform(**data_config, is_training=False)
         elif self.model_specs.model_family == 'i-jepa':
             self.image_processor = lambda x: x
-        elif self.model_specs.model_family == 'aim':
-            self.image_processor = val_transforms()
         else:
-            self.image_processor = AutoImageProcessor.from_pretrained(self.model_path)
+            self.image_processor = AutoImageProcessor.from_pretrained(self.model_path, trust_remote_code=True)
 
     def process_inputs(self, inputs):
         if self._is_timm_model():
@@ -124,16 +117,11 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             self.setup_timm_model()
         elif self.model_specs.model_family == 'i-jepa':
             self.setup_jepa_model()
-        elif self.model_specs.model_family == 'aim':
-            self.setup_aim_model()
         else:
             self.setup_huggingface_model()
 
     def setup_jepa_model(self):
         self.model = load_jepa_encoder(self.model_specs.model_size)
-
-    def setup_aim_model(self):
-        self.model = AIMForImageClassification.from_pretrained(self.model_path, revision=self.model_specs.revision)
 
     def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
@@ -142,7 +130,8 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         else:
             self.config = CONFIG_CLASS.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
-                                            output_hidden_states=True)
+                                            output_hidden_states=True,
+                                            trust_remote_code=True)
             self.config = update_config(self.config, self.model_specs)
         #self.num_layers = self.config.num_hidden_layers + 1 
         #self.update_evaluation_layer(self.evaluation_layer_idx)
@@ -152,7 +141,8 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             'revision': self.model_specs.revision,
             'config': self.config,
             'torch_dtype': torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-            'device_map': self.device_map if False else None
+            'device_map': self.device_map if False else None,
+            'trust_remote_code': True
         }
 
         self.model = MODEL_CLASS.from_pretrained(self.model_path, **FROM_PRETRAINED_KWARGS).eval()
@@ -179,7 +169,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         if isinstance(images, BatchFeature):
             inputs = images.to("cuda")
             inputs['pixel_values'] = inputs['pixel_values'].squeeze(1).to(self.dtype)
-        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa' or self.model_specs.model_family == 'aim':
+        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa':
             inputs = {
                 "x": images.to("cuda").to(self.dtype)
             }
