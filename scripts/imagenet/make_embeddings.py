@@ -85,7 +85,7 @@ for model_spec in models_to_try:
         save_path = f"embeddings/{model_spec.model_family}/{model_spec.model_size}/imagenet"
         backbone = VisionLayerwiseAutoModelWrapper(model_specs=model_spec)
 
-        optimal_batch_size = find_optimal_batch_size(backbone, 256, device=model_spec._get_first_layer_device())
+        optimal_batch_size = find_optimal_batch_size(backbone, 256, device=backbone._get_first_layer_device())
         print(model_spec)
         print(f"Optimal batch size: {optimal_batch_size}")
 
