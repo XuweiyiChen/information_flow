@@ -1,6 +1,6 @@
 # List of labels
 
-MODEL_SIZES=('70m' '160m' '410m' '1b', '1.4b')
+MODEL_SIZES=('70m' '160m' '410m' '1b' '1.4b')
 MAX_LAYER=50
 TASK='mmlu'
 
