@@ -1,6 +1,6 @@
 # List of labels
 
-MODEL_SIZES=('14m' '70m' '160m' '410m' '1b')
+MODEL_SIZES=('70m' '160m' '410m' '1b', '1.4b')
 MAX_LAYER=50
 TASK='mmlu'
 
@@ -39,7 +39,7 @@ for layer in $(seq 0 $MAX_LAYER); do
             GPU_ID=$(find_free_gpu)  # Find an available GPU
 
             if [[ $GPU_ID -ge 0 ]]; then
-                echo "Launching job for $label with epochs=$epoch and batch_size=$batch_size on GPU $GPU_ID"
+                echo "Launching job on $GPU_ID for Pythia-$size on layer $layer"
 
                 CUDA_VISIBLE_DEVICES=$GPU_ID python MMLU-Harness.py \
                     --model_size $size \

@@ -11,7 +11,7 @@ ADAPTED FROM https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_ev
 
 @register_model("pythia_lens")
 class PythiaLens(HFLM):
-    VALID_SIZES = ['14m', '70m', '160m', '410m', '1b']
+    VALID_SIZES = ['70m', '160m', '410m', '1b', '1.4b']
     def __init__(
         self,
         model_size='410m',
@@ -19,7 +19,7 @@ class PythiaLens(HFLM):
     ) -> None:
         assert model_size in self.VALID_SIZES
 
-        model_path=f"EleutherAI/pythia-{model_size}-deduped"
+        model_path=f"EleutherAI/pythia-{model_size}-deduped-v0"
         self.is_hf = True
         self.evaluation_layer = evaluation_layer
 
