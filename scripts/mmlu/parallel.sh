@@ -33,8 +33,8 @@ cleanup_finished_jobs() {
 }
 
 for lens_type in ${LENS_TYPES[@]}; do
-    for layer in $(seq 0 $MAX_LAYER); do
-        for size in ${MODEL_SIZES[@]}; do
+    for size in ${MODEL_SIZES[@]}; do
+        for layer in $(seq 0 $MAX_LAYER); do
             while true; do
             cleanup_finished_jobs  # Remove finished jobs
             GPU_ID=$(find_free_gpu)  # Find an available GPU
