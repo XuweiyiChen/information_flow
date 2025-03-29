@@ -55,6 +55,7 @@ for lens_type in ${LENS_TYPES[@]}; do
                 echo "No free GPU available. Checking again in 5 seconds..."
                 sleep 5
             fi
+            done
         done
     done
 done

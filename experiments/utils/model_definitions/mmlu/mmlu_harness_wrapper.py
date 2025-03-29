@@ -17,11 +17,16 @@ class PythiaLens(HFLM):
         self,
         model_size='410m',
         evaluation_layer=-1,
-        lens_type='tuned'
+        lens_type='tuned',
+        model_name='Pythia'
     ) -> None:
         assert model_size in self.VALID_SIZES
-
-        model_path=f"EleutherAI/pythia-{model_size}-deduped"
+        if model_name == 'Pythia':
+            model_path=f"EleutherAI/pythia-{model_size}-deduped"
+        elif model_name == 'Llama3':
+            model_path="meta-llama/Meta-Llama-3-8B"
+        else:
+            raise ValueError(f"Invalid model name: {model_name}")
         self.is_hf = True
         self.evaluation_layer = evaluation_layer
         self.lens_type = lens_type
