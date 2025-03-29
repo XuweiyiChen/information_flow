@@ -12,7 +12,7 @@ ADAPTED FROM https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_ev
 
 @register_model("pythia_lens")
 class PythiaLens(HFLM):
-    VALID_SIZES = ['70m', '160m', '410m', '1.4b', '2.8b']
+    VALID_SIZES = ['70m', '160m', '410m', '1.4b', '2.8b', '8B']
     def __init__(
         self,
         model_size='410m',
