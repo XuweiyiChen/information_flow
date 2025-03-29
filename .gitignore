@@ -10,7 +10,6 @@ experiments/checkpoints/*
 
 # hide particular files
 *.png
-*.sh
 *.pyc
 error_logs.txt
 

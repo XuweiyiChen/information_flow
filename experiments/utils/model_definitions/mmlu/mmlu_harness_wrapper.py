@@ -2,6 +2,7 @@ from typing import Optional, Union
 
 import torch
 from tuned_lens import TunedLens
+from tuned_lens.nn.lenses import LogitLens
 from lm_eval.api.registry import register_model
 from lm_eval.models.huggingface import HFLM
 from transformers import AutoModelForCausalLM
@@ -11,18 +12,19 @@ ADAPTED FROM https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_ev
 
 @register_model("pythia_lens")
 class PythiaLens(HFLM):
-    VALID_SIZES = ['70m', '160m', '410m', '1b', '1.4b']
+    VALID_SIZES = ['70m', '160m', '410m', '1.4b', '2.8b']
     def __init__(
         self,
         model_size='410m',
-        evaluation_layer=-1
+        evaluation_layer=-1,
+        lens_type='tuned'
     ) -> None:
         assert model_size in self.VALID_SIZES
 
-        model_path=f"EleutherAI/pythia-{model_size}-deduped-v0"
+        model_path=f"EleutherAI/pythia-{model_size}-deduped"
         self.is_hf = True
         self.evaluation_layer = evaluation_layer
-
+        self.lens_type = lens_type
         super().__init__(
             pretrained=model_path,
             tokenizer=model_path,
@@ -45,7 +47,10 @@ class PythiaLens(HFLM):
         )
 
         print(self.evaluation_layer, self.config.num_hidden_layers)
-        self.lens = TunedLens.from_model_and_pretrained(self._model)
+        if self.lens_type == 'tuned':
+            self.lens = TunedLens.from_model_and_pretrained(self._model)
+        else:
+            self.lens = LogitLens.from_model(self._model)
         self.lens.to(self._model.device)
 
         assert self.evaluation_layer <= self.config.num_hidden_layers, \
@@ -63,18 +68,13 @@ class PythiaLens(HFLM):
     
     def _model_generate(self, context, max_length, stop, **generation_kwargs):
         generation_kwargs["temperature"] = generation_kwargs.get("temperature", 0.0)
-        do_sample = generation_kwargs.get("do_sample", None)
-
-        # The temperature has to be a strictly positive float -- if it is 0.0, use greedy decoding strategies
-        if generation_kwargs.get("temperature") == 0.0 and do_sample is None:
-            generation_kwargs["do_sample"] = do_sample = False
-        if do_sample is False and generation_kwargs.get("temperature") == 0.0:
-            generation_kwargs.pop("temperature")
+        generation_kwargs["do_sample"] = generation_kwargs.get("do_sample", False)
 
         return self.lens.generate(
             model=self._model,
             layer=self.evaluation_layer,
             input_ids=context,
-            max_new_tokens=max_length,
-            **generation_kwargs,
+            max_new_tokens=5,
+            temp = generation_kwargs["temperature"],
+            do_sample = generation_kwargs["do_sample"]
         )

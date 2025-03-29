@@ -1,9 +1,9 @@
 # List of labels
 
-MODEL_SIZES=('70m' '160m' '410m' '1b' '1.4b')
+MODEL_SIZES=('70m' '160m' '410m' '1.4b' '2.8b')
 MAX_LAYER=50
 TASK='mmlu'
-
+LENS_TYPES=('logit' 'tuned')
 # Number of GPUs available
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 
@@ -32,9 +32,10 @@ cleanup_finished_jobs() {
     done
 }
 
-for layer in $(seq 0 $MAX_LAYER); do
-    for size in ${MODEL_SIZES[@]}; do
-        while true; do
+for lens_type in ${LENS_TYPES[@]}; do
+    for layer in $(seq 0 $MAX_LAYER); do
+        for size in ${MODEL_SIZES[@]}; do
+            while true; do
             cleanup_finished_jobs  # Remove finished jobs
             GPU_ID=$(find_free_gpu)  # Find an available GPU
 
@@ -44,7 +45,8 @@ for layer in $(seq 0 $MAX_LAYER); do
                 CUDA_VISIBLE_DEVICES=$GPU_ID python MMLU-Harness.py \
                     --model_size $size \
                     --evaluation_layer $layer \
-                    --task $TASK > logs/${size}_${layer}_${TASK}.log 2>&1 &
+                    --lens-type $lens_type \
+                    --task $TASK > logs/${size}_${layer}_${TASK}_${lens_type}.log 2>&1 &
 
                 JOB_PID=$!
                 GPU_JOB_MAP[$GPU_ID]=$JOB_PID  # Store the job's PID for tracking
