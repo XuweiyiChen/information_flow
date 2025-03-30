@@ -11,7 +11,7 @@ def parse_args():
     parser.add_argument('--model_size', type=str, default='70m', choices=PythiaLens.VALID_SIZES)
     parser.add_argument('--evaluation_layer', type=int, default=-1, help='Layer to use for evaluation. -1 for the final layer. This is 0-indexed.')
     parser.add_argument('--base_results_path', type=str, default='experiments/results')
-    parser.add_argument('--task', type=str, default='mmlu', choices=['mmlu', 'blimp', 'toxigen', 'winogender'])
+    parser.add_argument('--task', type=str, default='mmlu', choices=['mmlu', 'blimp', 'toxigen', 'crows_pairs_english'])
     parser.add_argument('--lens-type', type=str, default='tuned', choices=['logit', 'tuned'])
     return parser.parse_args()
 

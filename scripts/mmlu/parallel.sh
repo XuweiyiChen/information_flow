@@ -3,8 +3,8 @@
 MODEL_NAME='Pythia'
 MODEL_SIZES=('70m' '160m' '410m' '1.4b' '2.8b')
 MAX_LAYER=34
-TASKS=('mmlu' 'blimp' 'toxigen' 'winogender')
-LENS_TYPES=('logit' 'tuned')
+TASKS=('mmlu' 'blimp' 'toxigen' 'crows_pairs_english')
+LENS_TYPES=('tuned')
 # Number of GPUs available
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 
