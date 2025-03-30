@@ -5,17 +5,19 @@ import os
 import cmasher as cmr
 import numpy as np
 
-SIZES = ['70m', '160m', '410m', '1.4b', '2.8b']
+SIZES = ['410m']
 
 colors = cmr.lavender(np.linspace(0.8, 0.2, len(SIZES)))
-
-plt.figure(figsize=(10, 6))
+plt.rcParams.update({'font.size': 14})
+plt.figure(figsize=(8, 6))
 
 for i, size in enumerate(SIZES):
-    base_path = f"../../experiments/results/Pythia/{size}/main/mmlu"
+    base_path = f"/home/AD/ofsk222/Research/exploration/information_plane/experiments/results/Pythia/{size}/main/toxigen"
     layers = []
-    accuracies = []
-    std_errs = []
+    logit_accuracies = []
+    logit_std_errs = []
+    tuned_accuracies = []
+    tuned_std_errs = []
     
     # Iterate through all layer files
     for filename in os.listdir(base_path):
@@ -23,32 +25,50 @@ for i, size in enumerate(SIZES):
             # Extract layer number from filename
             layer_num = int(filename.split("_")[1])
             
-            # Load results from pickle file
-            path = os.path.join(base_path, filename, "tuned.pkl")
-            with open(path, 'rb') as infile:
-                results = pickle.load(infile)
-                
-            # Get accuracy from results
-            accuracy = results['results']['mmlu']['acc,none']
-            stderr = results['results']['mmlu']['acc_stderr,none']
-            
-            layers.append(layer_num)
-            accuracies.append(accuracy)
-            std_errs.append(stderr)
+            # Load results from logit pickle file
+            logit_path = os.path.join(base_path, filename, "logit.pkl")
+            if os.path.exists(logit_path):
+                with open(logit_path, 'rb') as infile:
+                    results = pickle.load(infile)
+                    task_name = 'mmlu' if 'mmlu' in base_path else 'toxigen'
+                    accuracy = results['results'][task_name]['acc,none']
+                    stderr = results['results'][task_name]['acc_stderr,none']
+                    layers.append(layer_num)
+                    logit_accuracies.append(accuracy)
+                    logit_std_errs.append(stderr)
+
+            # Load results from tuned pickle file  
+            tuned_path = os.path.join(base_path, filename, "tuned.pkl")
+            if os.path.exists(tuned_path):
+                with open(tuned_path, 'rb') as infile:
+                    results = pickle.load(infile)
+                    task_name = 'mmlu' if 'mmlu' in base_path else 'toxigen'
+                    accuracy = results['results'][task_name]['acc,none']
+                    stderr = results['results'][task_name]['acc_stderr,none']
+                    tuned_accuracies.append(accuracy)
+                    tuned_std_errs.append(stderr)
             
     # Sort by layer number
-    sorted_pairs = sorted(zip(layers, accuracies, std_errs))
-    layers, accuracies, std_errs = zip(*sorted_pairs)
+    sorted_pairs = sorted(zip(layers, logit_accuracies, logit_std_errs, tuned_accuracies, tuned_std_errs))
+    layers, logit_accuracies, logit_std_errs, tuned_accuracies, tuned_std_errs = zip(*sorted_pairs)
     
-    # Plot for this model size
-    plt.errorbar(layers, accuracies, yerr=std_errs, marker='o', linestyle='-', 
-                capsize=5, label=f'Pythia-{size}', color=colors[i])
+    # Plot for this model size - both logit and tuned
+    if False:
+        plt.errorbar(layers, logit_accuracies, yerr=logit_std_errs, marker='o', linestyle='-', 
+                    capsize=5, label=f'Logit Lens', color='red')
+        plt.errorbar(layers, tuned_accuracies, yerr=tuned_std_errs, marker='s', linestyle='-',
+                    capsize=5, label=f'Tuned Lens', color='blue')
+    else:
+        plt.plot(layers, logit_accuracies, marker='o', linestyle='-', 
+                label=f'Logit Lens', color='red')
+        plt.plot(layers, tuned_accuracies, marker='s', linestyle='-',
+                 label=f'Tuned Lens', color='blue')
 
 plt.xlabel('Layer')
-plt.ylabel('MMLU Accuracy')
-plt.title('MMLU Accuracy vs Layer for Different Pythia Scales')
+plt.ylabel('Toxigen Accuracy')
+plt.title('Layerwise Toxigen Accuracy on Pythia-410M')
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig('../../mmlu_pythia_scales.png')
+plt.savefig('toxigen_410m.pdf')    
 plt.close()
