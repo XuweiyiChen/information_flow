@@ -135,7 +135,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                             revision=self.model_specs.revision,
                                             output_hidden_states=True)
         self.num_layers = self.config.num_hidden_layers + 1 
-        self.update_evaluation_layer(self.evaluation_layer_idx)
+        self.update_evaluation_layer()
         self.config.num_hidden_layers = self.evaluation_layer_idx # prevents loading all layers
 
         FROM_PRETRAINED_KWARGS = {

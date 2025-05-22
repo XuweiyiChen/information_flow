@@ -1,6 +1,8 @@
 import gc
 import torch
 from ..model_definitions.vision_automodel_wrapper import VisionLayerwiseAutoModelWrapper
+from ..model_definitions.probe.LinearProbe import LinearModel
+from pytorch_lightning.utilities.rank_zero import rank_zero_only
 
 def garbage_collect_cuda():
     gc.collect()
@@ -27,8 +29,9 @@ def find_optimal_batch_size(model, number_of_samples, device, batch_size=512, ma
     for _ in range(max_trials):
         garbage_collect_cuda()
         try:
-            if isinstance(model, VisionLayerwiseAutoModelWrapper):
-                if model.model_specs.model_family == 'i-jepa':
+            if isinstance(model, VisionLayerwiseAutoModelWrapper) or isinstance(model, LinearModel):
+                model_family = model.model_specs.model_family if isinstance(model, VisionLayerwiseAutoModelWrapper) else model.backbone.model_specs.model_family
+                if model_family == 'i-jepa':
                     worst_case_batch = {
                         "x": torch.ones((batch_size, 3, 224, 224), dtype=model.dtype).to(device),
                     }
@@ -54,7 +57,6 @@ def find_optimal_batch_size(model, number_of_samples, device, batch_size=512, ma
             if is_oom_error(exception):
                 batch_size = batch_size // 2
                 if had_success:
-                    batch_size = int(batch_size * 0.5)
                     break
             else:
                 raise  # some other error not memory related

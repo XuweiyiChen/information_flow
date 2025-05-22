@@ -133,9 +133,10 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                             output_hidden_states=True,
                                             trust_remote_code=True)
             self.config = update_config(self.config, self.model_specs)
-        #self.num_layers = self.config.num_hidden_layers + 1 
-        #self.update_evaluation_layer(self.evaluation_layer_idx)
-        #self.config.num_hidden_layers = self.evaluation_layer_idx
+        
+        self.num_layers = self.config.num_hidden_layers + 1 
+        self.update_evaluation_layer()
+        self.config.num_hidden_layers = self.evaluation_layer_idx
 
         FROM_PRETRAINED_KWARGS = {
             'revision': self.model_specs.revision,

@@ -62,11 +62,11 @@ class BaseLayerwiseAutoModelWrapper:
     """
     BASE FUNCTIONS
     """
-    def update_evaluation_layer(self, evaluation_layer_idx):
-        if evaluation_layer_idx == -1:
+    def update_evaluation_layer(self):
+        if self.evaluation_layer_idx == -1:
             self.evaluation_layer_idx = self.num_layers - 1
         else:
-            self.evaluation_layer_idx = evaluation_layer_idx
+            self.evaluation_layer_idx = self.evaluation_layer_idx
 
         assert self.evaluation_layer_idx >= 0 and self.evaluation_layer_idx < self.num_layers, \
             f"Evaluation layer {self.evaluation_layer_idx} is not in the range of the model's hidden layers 0 to {self.num_layers - 1}"

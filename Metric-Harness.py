@@ -33,9 +33,9 @@ models_to_try = [
     # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet1k", revision="main"),
     # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet21k", revision="main"),
 
-    # VisionModelSpecifications(model_family="aim", model_size="600M", revision="main"),
-    VisionModelSpecifications(model_family="aim", model_size="1B", revision="main"),
-    VisionModelSpecifications(model_family="aim", model_size="3B", revision="main"),
+    VisionModelSpecifications(model_family="aim", model_size="huge", revision="main"),
+    #VisionModelSpecifications(model_family="aim", model_size="1B", revision="main"),
+    #VisionModelSpecifications(model_family="aim", model_size="3B", revision="main"),
     # VisionModelSpecifications(model_family="aim", model_size="7B", revision="main"),
 ]   
 
@@ -88,22 +88,22 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
         image_transform = validation_imagenet_transform()
         is_multiview = False
 
-    # validation_imagenet_dataset = prepare_datasets(
-    #     dataset="imagenet", 
-    #     transform=image_transform,
-    #     train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
-    #     number_of_samples=dataloader_kwargs["num_samples"]
-    # )
-
-    validation_imagenet_dataset = ImageDatasetFromDirectory(
-        directory="/home/mila/a/arefinmr/scratch/LLM/information_flow/VisionCausal/data",
-        transform=val_transforms(),
-        n=dataloader_kwargs["num_samples"]
+    validation_imagenet_dataset = prepare_datasets(
+        dataset="imagenet", 
+        transform=image_transform,
+        train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+        number_of_samples=dataloader_kwargs["num_samples"]
     )
+
+    # validation_imagenet_dataset = ImageDatasetFromDirectory(
+    #     directory="/home/mila/a/arefinmr/scratch/LLM/information_flow/VisionCausal/data",
+    #     transform=val_transforms(),
+    #     n=dataloader_kwargs["num_samples"]
+    # )
 
     optimal_batch_size = find_optimal_batch_size(model, len(validation_imagenet_dataset), device=model.device)
     validation_dataloader = prepare_dataloader(validation_imagenet_dataset, 
-                                               batch_size=256, 
+                                               batch_size=optimal_batch_size, 
                                                num_workers=4, 
                                                shuffle=False, 
                                                drop_last=False,

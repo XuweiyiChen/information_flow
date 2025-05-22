@@ -2,7 +2,7 @@
 
 
 import logging
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union, Sequence
 
 import lightning as pl
 import omegaconf
@@ -13,6 +13,32 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 from .accuracy_metrics import accuracy_at_k, weighted_mean
 from .helpers import omegaconf_select, remove_bias_and_norm_from_weight_decay
+
+class AverageLayers(nn.Module):
+    # adapted from https://github.com/apple/ml-aim/
+    def __init__(self, layers: Sequence[int], reduce: bool = False):
+        super().__init__()
+        self.layers = layers  # List of layer indices to average
+        self.reduce = reduce  # Whether to reduce across sequence dimension
+
+    def forward(
+        self, layer_features: List[torch.Tensor]
+    ) -> torch.Tensor:
+        # layer_features: List[Tensor] where each tensor has shape (batch_size, seq_len, hidden_dim)
+        # Select specified layers
+        layer_features = [layer_features[layer_id] for layer_id in self.layers]
+        # Stack along new dimension: (batch_size, seq_len, hidden_dim, num_layers)
+        feats = torch.stack(layer_features, dim=-1)
+        # Average across layers: (batch_size, seq_len, hidden_dim)
+        feats = feats.mean(dim=-1)
+        # If reduce=True, average across sequence dimension: (batch_size, hidden_dim)
+        # If reduce=False, keep sequence dimension: (batch_size, seq_len, hidden_dim)
+        return feats.mean(dim=1) if self.reduce else feats
+
+    @property
+    def max_block_id(self) -> int:
+        return max(self.layers)  # Returns highest layer index used
+
 
 class LinearModel(pl.LightningModule):
     _OPTIMIZERS = {
@@ -30,6 +56,7 @@ class LinearModel(pl.LightningModule):
     def __init__(
         self,
         cfg: omegaconf.DictConfig,
+        backbone: nn.Module,
     ):
         """Implements linear and finetune evaluation.
 
@@ -73,8 +100,17 @@ class LinearModel(pl.LightningModule):
 
         cfg = self.add_and_assert_specific_cfg(cfg)
 
+        # attention pooling
+        # attention pooling to convert [B, T, D] -> [B, D]
+        self.attention_pooling = nn.Sequential(
+            nn.Linear(backbone.num_features, backbone.num_features // 4),
+            nn.ReLU(),
+            nn.Linear(backbone.num_features // 4, 1)
+        )
+        self.softmax = nn.Softmax(dim=1)  # softmax over token dimension
+
         # classifier
-        self.classifier = nn.LazyLinear(cfg.data.num_classes)  # type: ignore
+        self.classifier = nn.Linear(backbone.num_features, cfg.data.num_classes)  # type: ignore
 
         self.loss_func = nn.CrossEntropyLoss()
 
@@ -84,7 +120,6 @@ class LinearModel(pl.LightningModule):
 
         # optimizer related
         self.optimizer: str = cfg.optimizer.name
-        self.batch_size: int = cfg.optimizer.batch_size
         self.lr: float = cfg.optimizer.lr
         self.weight_decay: float = cfg.optimizer.weight_decay
         self.extra_optimizer_args: Dict[str, Any] = cfg.optimizer.kwargs
@@ -101,6 +136,18 @@ class LinearModel(pl.LightningModule):
         self.validation_step_outputs = []
 
         self.eval_layer = cfg.eval_layer
+        self.layer_window = cfg.layer_window
+        
+        # Create layer averaging module if using multiple layers
+        if self.layer_window > 0:
+            layers = range(max(0, self.eval_layer - self.layer_window), self.eval_layer)
+            print(f'layers: {layers}')
+            self.layer_averager = AverageLayers(
+                layers=layers,
+                reduce=False
+            )
+
+        self.backbone = backbone
 
     @staticmethod
     def add_and_assert_specific_cfg(cfg: omegaconf.DictConfig) -> omegaconf.DictConfig:
@@ -137,7 +184,9 @@ class LinearModel(pl.LightningModule):
             cfg, "performance.disable_channel_last", False
         )
 
+        # default parameters for layer evaluation
         cfg.eval_layer = omegaconf_select(cfg, "eval_layer", -1)
+        cfg.layer_window = omegaconf_select(cfg, "layer_window", 0)  # Default to 0 for original behavior
 
         return cfg
 
@@ -150,7 +199,8 @@ class LinearModel(pl.LightningModule):
 
 
         learnable_params = (
-            self.classifier.parameters()
+            list(self.classifier.parameters()) +
+            list(self.attention_pooling.parameters())
         )
 
         # exclude bias and norm from weight decay
@@ -171,16 +221,29 @@ class LinearModel(pl.LightningModule):
 
         return [optimizer], [scheduler]
 
-    def forward(self, X: torch.tensor) -> Dict[str, Any]:
+    def forward(self, **kwargs) -> Dict[str, Any]:
         """Performs forward pass of the frozen backbone and the linear layer for evaluation.
 
         Args:
-            X (torch.tensor): a batch of images in the tensor format.
+            pixel_values (torch.tensor): a batch of images in the tensor format.
 
         Returns:
             Dict[str, Any]: a dict containing features and logits.
         """
-        logits = self.classifier(X)
+        with torch.no_grad():
+            outputs = self.backbone(**kwargs)
+            
+            if self.layer_window > 0:
+                # Get features from multiple layers and average them
+                hidden_states = self.layer_averager(outputs['hidden_states'])  # [B, T, D]
+            else:
+                # Original behavior - use single layer
+                hidden_states = outputs['hidden_states'][self.eval_layer-1]  # [B, T, D]
+
+        attention_weights = self.attention_pooling(hidden_states)  # [B, T, 1]
+        attention_weights = self.softmax(attention_weights)  # [B, T, 1]
+        pooled_features = torch.sum(hidden_states * attention_weights, dim=1)  # [B, D]
+        logits = self.classifier(pooled_features)
         return {"logits": logits}
 
     def shared_step(
@@ -196,16 +259,11 @@ class LinearModel(pl.LightningModule):
             Tuple[int, torch.Tensor, torch.Tensor, torch.Tensor]:
                 batch size, loss, accuracy @1 and accuracy @5.
         """
-        X, target = batch
-        X = X.to(self.device)
-        target = target.to(self.device)
+        inputs, labels = self.backbone.prepare_inputs(batch, return_labels=True)
+        target = labels.to(self.device)
         metrics = {"batch_size": target.size(0)}
 
-        assert self.eval_layer == -1 or self.eval_layer <= X.shape[1], \
-            f"Eval layer {self.eval_layer} is not supported for max layer {X.shape[1]}"
-        X = X[:, self.eval_layer, :]
-
-        out = self(X)["logits"]
+        out = self.forward(**inputs)["logits"]
         loss = F.cross_entropy(out, target)
         acc1, acc5 = accuracy_at_k(out, target, top_k=(1, 5))
         metrics.update({"loss": loss, "acc1": acc1, "acc5": acc5})
@@ -227,6 +285,9 @@ class LinearModel(pl.LightningModule):
         log = {"train_loss": out["loss"]}
 
         log.update({"train_acc1": out["acc1"], "train_acc5": out["acc5"]})
+        # print every 100 steps
+        if batch_idx % 10 == 0:
+            print(log)
 
         self.log_dict(log, on_epoch=True, sync_dist=True)
         return out["loss"]

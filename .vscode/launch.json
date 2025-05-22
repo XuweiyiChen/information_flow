@@ -54,12 +54,20 @@
                 "--raise_error", "True"
             ],
             "justMyCode": false
-        }
+        },
         {
             "name": "Metric Harness",
             "type": "debugpy",
             "request": "launch",
             "program": "MetricHarness.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "MMLU Harness",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "MMLU-Harness.py",
             "console": "integratedTerminal",
             "justMyCode": false
         }
