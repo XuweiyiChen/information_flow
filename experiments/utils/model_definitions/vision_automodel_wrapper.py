@@ -8,6 +8,7 @@ from torch.utils.data import Subset
 from torchvision import transforms
 from typing import Any, List
 import tqdm
+from aim.v1.torch.models import AIMForImageClassification
 
 from .base_automodel_wrapper import BaseModelSpecifications, BaseLayerwiseAutoModelWrapper
 from .jepa.JepaEncoder import load_jepa_encoder
@@ -25,7 +26,8 @@ model_name_to_sizes = {
     'clip': ['base', 'large'],
     'i-jepa': ['imagenet1k', 'imagenet21k'],
     'beit': ['base', 'large'],
-    'aim': ['large', 'huge', '1B', '3B']  # large is 300M, huge is 600M
+    'aim': ['large', 'huge', '1B', '3B'],
+    'aimv2': ['large', 'huge', '1B', '3B']
 }
 model_types = list(model_name_to_sizes.keys())
 
@@ -62,6 +64,8 @@ def get_model_path(name, size):
     elif name == 'beit':
         return f"microsoft/beit-{size}-patch16-224"
     elif name == 'aim':
+        return "apple/aim-600M"
+    elif name == 'aimv2':
         return f"apple/aimv2-{size}-patch14-224"
 
 def update_config(config, model_specs):
@@ -73,6 +77,8 @@ def update_config(config, model_specs):
 def get_model_and_config_classes(model_specs):
     if model_specs.model_family == 'clip':
         return CLIPVisionModel, CLIPVisionConfig
+    elif model_specs.model_family == 'aim':
+        return AIMForImageClassification, None
     else:
         return AutoModel, AutoConfig
 
@@ -99,7 +105,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         if self._is_timm_model():
            data_config = timm.data.resolve_model_data_config(self.model)
            self.image_processor = timm.data.create_transform(**data_config, is_training=False)
-        elif self.model_specs.model_family == 'i-jepa':
+        elif self.model_specs.model_family in ['i-jepa', 'aim']:
             self.image_processor = lambda x: x
         else:
             self.image_processor = AutoImageProcessor.from_pretrained(self.model_path, trust_remote_code=True)
@@ -117,11 +123,21 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             self.setup_timm_model()
         elif self.model_specs.model_family == 'i-jepa':
             self.setup_jepa_model()
+        elif self.model_specs.model_family == 'aim':
+            self.setup_aim_model()
         else:
             self.setup_huggingface_model()
 
     def setup_jepa_model(self):
         self.model = load_jepa_encoder(self.model_specs.model_size)
+
+    def setup_aim_model(self):
+        # with the standard AIMv1 git pull, there may be a bug in the config
+        # where the img_size variable is called image_size. Manual fix for now
+        self.model = AIMForImageClassification.from_pretrained(self.model_path)
+        self.model.forward = lambda x: {'hidden_states': self.model.extract_features(x)}
+        self.model.trunk.post_transformer_layer = None
+        self.model.eval().cuda()
 
     def setup_huggingface_model(self):
         MODEL_CLASS, CONFIG_CLASS = get_model_and_config_classes(self.model_specs)
@@ -170,7 +186,7 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         if isinstance(images, BatchFeature):
             inputs = images.to("cuda")
             inputs['pixel_values'] = inputs['pixel_values'].squeeze(1).to(self.dtype)
-        elif 'timm' in self.model_path or self.model_specs.model_family == 'i-jepa':
+        elif self._is_timm_model() or self.model_specs.model_family in ['i-jepa', 'aim']:
             inputs = {
                 "x": images.to("cuda").to(self.dtype)
             }
@@ -284,8 +300,11 @@ class VisionLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             return self.model.num_features
         elif hasattr(self.model, "inplanes"):
             return self.model.inplanes
-        elif hasattr(self.model.config, "hidden_size"):
+        elif hasattr(self.model, "config") and hasattr(self.model.config, "hidden_size"):
             return self.model.config.hidden_size
+        elif type(self.model) == AIMForImageClassification:
+            # for v1 600M
+            return 1536
         else:
             raise ValueError("Could not find num_features or inplanes")
 

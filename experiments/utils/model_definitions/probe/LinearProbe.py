@@ -40,19 +40,66 @@ class AverageLayers(nn.Module):
         return max(self.layers)  # Returns highest layer index used
 
 
+class AttentionPoolingClassifier(nn.Module):
+    def __init__(
+        self,
+        dim: int,
+        out_features: int,
+        num_heads: int = 12,
+        num_queries: int = 1,
+        use_batch_norm: bool = True,
+        qkv_bias: bool = False,
+        linear_bias: bool = True,
+        average_pool: bool = True,
+    ):
+        super().__init__()
+        self.num_heads = num_heads
+        self.num_queries = num_queries
+        self.average_pool = average_pool
+
+        self.k = nn.Linear(dim, dim, bias=qkv_bias)
+        self.v = nn.Linear(dim, dim, bias=qkv_bias)
+        self.cls_token = nn.Parameter(torch.randn(1, num_queries, dim) * 0.02)
+        self.linear = nn.Linear(dim, out_features, bias=linear_bias)
+        self.bn = (
+            nn.BatchNorm1d(dim, affine=False, eps=1e-6)
+            if use_batch_norm
+            else nn.Identity()
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        B, N, C = x.shape
+        x = self.bn(x.transpose(-2, -1)).transpose(-2, -1)
+        cls_token = self.cls_token.expand(B, -1, -1)
+
+        q = cls_token.reshape(
+            B, self.num_queries, self.num_heads, C // self.num_heads
+        ).permute(0, 2, 1, 3)
+        k = (
+            self.k(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
+        v = (
+            self.v(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
+
+        x_cls = F.scaled_dot_product_attention(q, k, v)
+        x_cls = x_cls.transpose(1, 2).reshape(B, self.num_queries, C)
+        x_cls = x_cls.mean(dim=1) if self.average_pool else x_cls
+
+        out = self.linear(x_cls)
+        return out
+
 class LinearModel(pl.LightningModule):
     _OPTIMIZERS = {
         "sgd": torch.optim.SGD,
         "adam": torch.optim.Adam,
         "adamw": torch.optim.AdamW,
     }
-    _SCHEDULERS = [
-        "reduce",
-        "step",
-        "exponential",
-        "none",
-    ]
-
+ 
     def __init__(
         self,
         cfg: omegaconf.DictConfig,
@@ -74,15 +121,7 @@ class LinearModel(pl.LightningModule):
                 lr (float): learning rate.
                 weight_decay (float): weight decay for optimizer.
                 kwargs (Dict): extra named arguments for the optimizer.
-            scheduler:
-                name (str): name of the scheduler.
-                min_lr (float): minimum learning rate for warmup scheduler. Defaults to 0.0.
-                warmup_start_lr (float): initial learning rate for warmup scheduler.
-                    Defaults to 0.00003.
-                warmup_epochs (float): number of warmup epochs. Defaults to 10.
-                lr_decay_steps (Sequence, optional): steps to decay the learning rate
-                    if scheduler is step. Defaults to None.
-                interval (str): interval to update the lr scheduler. Defaults to 'step'.
+
 
             finetune (bool): whether or not to finetune the backbone. Defaults to False.
 
@@ -102,15 +141,13 @@ class LinearModel(pl.LightningModule):
 
         # attention pooling
         # attention pooling to convert [B, T, D] -> [B, D]
-        self.attention_pooling = nn.Sequential(
-            nn.Linear(backbone.num_features, backbone.num_features // 4),
-            nn.ReLU(),
-            nn.Linear(backbone.num_features // 4, 1)
+        self.classifier = AttentionPoolingClassifier(
+            dim=backbone.num_features,
+            out_features=cfg.data.num_classes,
+            num_heads=cfg.probe.num_heads,
+            num_queries=cfg.probe.num_queries,
+            use_batch_norm=cfg.probe.use_batch_norm,
         )
-        self.softmax = nn.Softmax(dim=1)  # softmax over token dimension
-
-        # classifier
-        self.classifier = nn.Linear(backbone.num_features, cfg.data.num_classes)  # type: ignore
 
         self.loss_func = nn.CrossEntropyLoss()
 
@@ -126,9 +163,6 @@ class LinearModel(pl.LightningModule):
         self.exclude_bias_n_norm_wd: bool = cfg.optimizer.exclude_bias_n_norm_wd
         self.layer_decay: float = cfg.optimizer.layer_decay
 
-        # scheduler related
-        self.lr_decay_steps: Union[List[int], None] = cfg.scheduler.lr_decay_steps
-
         # for performance
         self.no_channel_last = cfg.performance.disable_channel_last
 
@@ -141,7 +175,6 @@ class LinearModel(pl.LightningModule):
         # Create layer averaging module if using multiple layers
         if self.layer_window > 0:
             layers = range(max(0, self.eval_layer - self.layer_window), self.eval_layer)
-            print(f'layers: {layers}')
             self.layer_averager = AverageLayers(
                 layers=layers,
                 reduce=False
@@ -171,12 +204,6 @@ class LinearModel(pl.LightningModule):
         # default for acc grad batches
         cfg.accumulate_grad_batches = omegaconf_select(cfg, "accumulate_grad_batches", 1)
 
-        # default parameters for the scheduler
-        cfg.scheduler.lr_decay_steps = omegaconf_select(cfg, "scheduler.lr_decay_steps", None)
-        cfg.scheduler.min_lr = omegaconf_select(cfg, "scheduler.min_lr", 0.0)
-        cfg.scheduler.warmup_start_lr = omegaconf_select(cfg, "scheduler.warmup_start_lr", 3e-5)
-        cfg.scheduler.warmup_epochs = omegaconf_select(cfg, "scheduler.warmup_epochs", 10)
-        cfg.scheduler.interval = omegaconf_select(cfg, "scheduler.interval", "step")
 
         # default parameters for performance optimization
         cfg.performance = omegaconf_select(cfg, "performance", {})
@@ -185,8 +212,12 @@ class LinearModel(pl.LightningModule):
         )
 
         # default parameters for layer evaluation
-        cfg.eval_layer = omegaconf_select(cfg, "eval_layer", -1)
-        cfg.layer_window = omegaconf_select(cfg, "layer_window", 0)  # Default to 0 for original behavior
+        cfg.probe = omegaconf_select(cfg, "probe", {})
+        cfg.probe.eval_layer = omegaconf_select(cfg, "eval_layer", -1)
+        cfg.probe.layer_window = omegaconf_select(cfg, "layer_window", 0)  # Default to 0 for original behavior
+        cfg.probe.num_heads = omegaconf_select(cfg, "num_heads", 8)
+        cfg.probe.num_queries = omegaconf_select(cfg, "num_queries", 1)
+        cfg.probe.use_batch_norm = omegaconf_select(cfg, "use_batch_norm", True)
 
         return cfg
 
@@ -199,8 +230,7 @@ class LinearModel(pl.LightningModule):
 
 
         learnable_params = (
-            list(self.classifier.parameters()) +
-            list(self.attention_pooling.parameters())
+            list(self.classifier.parameters())
         )
 
         # exclude bias and norm from weight decay
@@ -217,9 +247,7 @@ class LinearModel(pl.LightningModule):
             **self.extra_optimizer_args,
         )
 
-        scheduler = MultiStepLR(optimizer, self.lr_decay_steps, gamma=0.1)
-
-        return [optimizer], [scheduler]
+        return optimizer
 
     def forward(self, **kwargs) -> Dict[str, Any]:
         """Performs forward pass of the frozen backbone and the linear layer for evaluation.
@@ -232,7 +260,6 @@ class LinearModel(pl.LightningModule):
         """
         with torch.no_grad():
             outputs = self.backbone(**kwargs)
-            
             if self.layer_window > 0:
                 # Get features from multiple layers and average them
                 hidden_states = self.layer_averager(outputs['hidden_states'])  # [B, T, D]
@@ -240,10 +267,7 @@ class LinearModel(pl.LightningModule):
                 # Original behavior - use single layer
                 hidden_states = outputs['hidden_states'][self.eval_layer-1]  # [B, T, D]
 
-        attention_weights = self.attention_pooling(hidden_states)  # [B, T, 1]
-        attention_weights = self.softmax(attention_weights)  # [B, T, 1]
-        pooled_features = torch.sum(hidden_states * attention_weights, dim=1)  # [B, D]
-        logits = self.classifier(pooled_features)
+        logits = self.classifier(hidden_states)
         return {"logits": logits}
 
     def shared_step(
@@ -329,4 +353,4 @@ class LinearModel(pl.LightningModule):
 
         log = {"val_loss": val_loss, "val_acc1": val_acc1, "val_acc5": val_acc5}
         self.log_dict(log, sync_dist=True)
-        print(f"Validation loss: {val_loss}, Validation accuracy @1: {val_acc1}, Validation accuracy @5: {val_acc5}")
+        print(f"Validation loss: {val_loss.item()}, Validation accuracy @1: {val_acc1.item()}, Validation accuracy @5: {val_acc5.item()}")

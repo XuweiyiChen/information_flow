@@ -7,11 +7,16 @@ experiments/large_results/*
 embeddings/*
 embeddings
 experiments/checkpoints/*
+checkpoints/*
+logs/*
 
 # hide particular files
 *.png
 *.pyc
 error_logs.txt
+*.ckpt
+*.log
+
 
 # hide papermill notebooks
 experiments/output*.ipynb
