@@ -32,8 +32,15 @@ models_to_try = [
     # #VisionModelSpecifications(model_family="vit", model_size="huge", revision="main"),
     # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet1k", revision="main"),
     # VisionModelSpecifications(model_family="i-jepa", model_size="imagenet21k", revision="main"),
+    VisionModelSpecifications(model_family="clip", model_size="large", revision="main"),
+    VisionModelSpecifications(model_family="dinov2", model_size="large", revision="main"),
+    VisionModelSpecifications(model_family="mae", model_size="large", revision="main"),
+    VisionModelSpecifications(model_family="vit", model_size="large", revision="main"),
+    VisionModelSpecifications(model_family="aim", model_size="large", revision="main"),
+    VisionModelSpecifications(model_family="aimv2", model_size="large", revision="main"),
 
-    VisionModelSpecifications(model_family="aim", model_size="huge", revision="main"),
+    VisionModelSpecifications(model_family="beit", model_size="large", revision="main"),
+    # VisionModelSpecifications(model_family="aim", model_size="huge", revision="main"),
     #VisionModelSpecifications(model_family="aim", model_size="1B", revision="main"),
     #VisionModelSpecifications(model_family="aim", model_size="3B", revision="main"),
     # VisionModelSpecifications(model_family="aim", model_size="7B", revision="main"),
@@ -49,9 +56,9 @@ models_to_try = [
 
 metrics_to_try = [
     EvaluationMetricSpecifications(evaluation_metric="prompt-entropy", alpha=1),
-    EvaluationMetricSpecifications(evaluation_metric="dataset-entropy", alpha=1),
-    EvaluationMetricSpecifications(evaluation_metric="infonce"),
-    EvaluationMetricSpecifications(evaluation_metric="dime"),
+    # EvaluationMetricSpecifications(evaluation_metric="dataset-entropy", alpha=1),
+    # EvaluationMetricSpecifications(evaluation_metric="infonce"),
+    # EvaluationMetricSpecifications(evaluation_metric="dime"),
     EvaluationMetricSpecifications(evaluation_metric="lidar"),
 ]
 
@@ -89,9 +96,9 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
         is_multiview = False
 
     validation_imagenet_dataset = prepare_datasets(
-        dataset="imagenet", 
+        dataset="imagenet100", 
         transform=image_transform,
-        train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet/ILSVRC/Data/CLS-LOC/val_sorted",
+        train_data_path="/home/AD/ofsk222/Research/exploration/information_plane/experiments/datasets/imagenet100/val",
         number_of_samples=dataloader_kwargs["num_samples"]
     )
 
@@ -101,7 +108,7 @@ for model_specs, evaluation_metric_specs in itertools.product(models_to_try, met
     #     n=dataloader_kwargs["num_samples"]
     # )
 
-    optimal_batch_size = find_optimal_batch_size(model, len(validation_imagenet_dataset), device=model.device)
+    optimal_batch_size = 32 #find_optimal_batch_size(model, len(validation_imagenet_dataset), device=model.device)
     validation_dataloader = prepare_dataloader(validation_imagenet_dataset, 
                                                batch_size=optimal_batch_size, 
                                                num_workers=4, 
