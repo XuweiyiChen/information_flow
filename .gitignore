@@ -21,3 +21,4 @@ error_logs.txt
 # hide papermill notebooks
 experiments/output*.ipynb
 scripts/imagenet/make_embeddings.py
+env

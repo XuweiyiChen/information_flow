@@ -16,7 +16,7 @@ numpy==1.26.4
 pandas==2.2.2
 peft==0.11.1
 -e git+https://github.com/uk-cliplab/representation-itl.git#egg=representation_itl
-torch==2.3.0
+torch==2.3.1
 torchsummary==1.5.1
 tqdm==4.66.4
 transformers==4.40.2
@@ -24,3 +24,5 @@ umap-learn==0.5.6
 timm==1.0.11
 -e git+https://github.com/AlignmentResearch/tuned-lens#egg=tuned_lens
 omegaconf
+-e git+https://github.com/apple/ml-aim.git#subdirectory=aim-v1&egg=aim-v1
+lightning
