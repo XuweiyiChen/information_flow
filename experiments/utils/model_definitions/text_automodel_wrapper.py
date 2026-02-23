@@ -1,4 +1,5 @@
 from typing import Any, List
+import gc
 
 import tqdm
 import numpy as np
@@ -22,7 +23,10 @@ model_types = ["cerebras",
                 "LLM2Vec-mntp-unsup-simcse", 
                 "LLM2Vec-mntp-supervised",
                 "LLM2Vec-mntp",
-                "llama-instruct"]
+                "llama-instruct",
+                "gated_attention_baseline",
+                "gated_attention_elementwise",
+                "gated_attention_headwise"]
 
 cerebras_sizes = ['111M', '256M', '590M', '1.3B', '2.7B', '6.7B', '13B'] # '13b' also exists but doesnt fit in 24G for bfloat16
 Pythia_sizes = ['14m', '70m', '160m', '410m', '1b', '1.4b', '2.8b', '6.9b'] # '12b' also exists but doesnt fit in 24G for bfloat16
@@ -33,6 +37,7 @@ medical_llama3_sizes = ['8B'] # its only 8B model
 llama3_sizes = ['8B'] 
 LLM2Vec_sizes = ['8B']
 llama_instruct_sizes = ['8B']
+gated_attention_sizes = ['1B']
 
 model_name_to_sizes = {
     'Pythia': Pythia_sizes,
@@ -47,6 +52,9 @@ model_name_to_sizes = {
     'llama-instruct': llama_instruct_sizes,
     'LLM2Vec-mntp-supervised': LLM2Vec_sizes,
     'LLM2Vec-mntp': LLM2Vec_sizes,
+    'gated_attention_baseline': gated_attention_sizes,
+    'gated_attention_elementwise': gated_attention_sizes,
+    'gated_attention_headwise': gated_attention_sizes,
 }
 
 
@@ -88,6 +96,15 @@ def get_model_path(name, size):
     elif name == "llama-instruct":
         assert size in llama_instruct_sizes
         return f"meta-llama/Meta-Llama-3-8B-Instruct"
+    elif name == "gated_attention_baseline":
+        assert size in gated_attention_sizes
+        return "/anvil/scratch/x-xchen8/information_flow/gated_attention/checkpoints/gated_attention/1B_baseline"
+    elif name == "gated_attention_elementwise":
+        assert size in gated_attention_sizes
+        return "/anvil/scratch/x-xchen8/information_flow/gated_attention/checkpoints/gated_attention/1B_gate_elementwise"
+    elif name == "gated_attention_headwise":
+        assert size in gated_attention_sizes
+        return "/anvil/scratch/x-xchen8/information_flow/gated_attention/checkpoints/gated_attention/1B_gate_headwise"
     else:
         raise ValueError(f"Model type {name} not found")
 
@@ -121,7 +138,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     FUNCTIONS FOR INITIALIZATION
     """
     def setup_input_processor(self):
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, trust_remote_code=True)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = "left"
@@ -133,7 +150,8 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
     def setup_model(self):
         self.config = AutoConfig.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
-                                            output_hidden_states=True)
+                                            output_hidden_states=True,
+                                            trust_remote_code=True)
         self.num_layers = self.config.num_hidden_layers + 1 
         self.update_evaluation_layer()
         self.config.num_hidden_layers = self.evaluation_layer_idx # prevents loading all layers
@@ -142,7 +160,8 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
             'revision': self.model_specs.revision,
             'config': self.config,
             'torch_dtype': torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-            'device_map': self.device_map
+            'device_map': self.device_map,
+            'trust_remote_code': True
         }
 
         if 'llm2vec' in self.model_path.lower():
@@ -190,29 +209,41 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
                                                      verbose=verbose)
         self.batch_size_hint = optimal_batch_size
 
-        # create dataloader
+        # create dataloader and run encoding with OOM retry (halve batch size on failure)
         dataset = [{"input_ids": ids, "attention_mask": mask} 
             for ids, mask in zip(tokenized_sentences["input_ids"], 
                                 tokenized_sentences["attention_mask"])]
-        dataloader = DataLoader(dataset, 
-                                batch_size=optimal_batch_size, 
-                                shuffle=False, 
-                                num_workers=8, 
-                                collate_fn=text_collate)
 
-        if return_raw_hidden_states:
-            embeddings, raw_hidden_states, layerwise_encodings = self._encode_helper(dataloader, 
-                                                            verbose=verbose, 
-                                                            return_raw_hidden_states=return_raw_hidden_states,
-                                                            **kwargs)
-            return np.array(embeddings), raw_hidden_states, layerwise_encodings
-        
-        else:
-            embeddings = self._encode_helper(dataloader, 
-                                            verbose=verbose, 
-                                            return_raw_hidden_states=return_raw_hidden_states,
-                                            **kwargs) # shape: (num_samples, embedding_dim)
-            return np.array(embeddings)
+        while optimal_batch_size >= 1:
+            dataloader = DataLoader(dataset, 
+                                    batch_size=optimal_batch_size, 
+                                    shuffle=False, 
+                                    num_workers=8, 
+                                    collate_fn=text_collate)
+            try:
+                if return_raw_hidden_states:
+                    embeddings, raw_hidden_states, layerwise_encodings = self._encode_helper(dataloader, 
+                                                                    verbose=verbose, 
+                                                                    return_raw_hidden_states=return_raw_hidden_states,
+                                                                    **kwargs)
+                    return np.array(embeddings), raw_hidden_states, layerwise_encodings
+                else:
+                    embeddings = self._encode_helper(dataloader, 
+                                                    verbose=verbose, 
+                                                    return_raw_hidden_states=return_raw_hidden_states,
+                                                    **kwargs) # shape: (num_samples, embedding_dim)
+                    return np.array(embeddings)
+
+            except RuntimeError as e:
+                if "out of memory" in str(e):
+                    optimal_batch_size = optimal_batch_size // 2
+                    print(f"CUDA OOM during encoding. Retrying with batch_size={optimal_batch_size}...")
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                else:
+                    raise
+
+        raise RuntimeError("CUDA out of memory even with batch_size=1")
     
     
     def _get_model_with_forward_pass(self):

@@ -22,3 +22,6 @@ error_logs.txt
 experiments/output*.ipynb
 scripts/imagenet/make_embeddings.py
 env
+
+experiments/results_V2
+gated_attention

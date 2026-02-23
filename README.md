@@ -120,6 +120,41 @@ More scripts, including SLURM examples, are available in the `slurm_scripts/` fo
 
 ---
 
+### Gated Attention Models (Qwen3 variants)
+
+Three custom Qwen3 models with gating mechanisms are supported:
+
+* `gated_attention_baseline` — standard Qwen3, no gating (1B parameters, 28 layers)
+* `gated_attention_elementwise` — per-element gating on attention output (1B parameters, 28 layers)
+* `gated_attention_headwise` — per-head scalar gating on attention output (1B parameters, 28 layers)
+
+Checkpoints are located at `gated_attention/checkpoints/gated_attention/`.
+
+**Single model, single layer:**
+
+```bash
+python3 -u MTEB-Harness.py \
+    --model_family "gated_attention_baseline" \
+    --model_size "1B" \
+    --revision "main" \
+    --evaluation_layer -1 \
+    --base_results_path "experiments/results" \
+    --purpose run_tasks
+```
+
+**All three models, all layers (SLURM on Anvil):**
+
+The SLURM script is pre-configured for Anvil (`--partition=ai`, `--account=nairr250073-ai`). To launch:
+
+```bash
+cd scripts/slurm_scripts
+bash gated-attention-mteb-sweep.sh
+```
+
+This submits 87 SLURM jobs (3 models x 29 layers). Set `USE_SLURM=0` in the sweep script to run locally instead.
+
+---
+
 ## 📊 Calculating Representation Metrics
 
 To compute **metrics like prompt entropy** across all layers:
