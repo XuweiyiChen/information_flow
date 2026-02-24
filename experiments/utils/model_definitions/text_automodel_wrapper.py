@@ -151,6 +151,7 @@ class TextLayerwiseAutoModelWrapper(BaseLayerwiseAutoModelWrapper):
         self.config = AutoConfig.from_pretrained(self.model_path, 
                                             revision=self.model_specs.revision,
                                             output_hidden_states=True,
+                                            use_cache=False,
                                             trust_remote_code=True)
         self.num_layers = self.config.num_hidden_layers + 1 
         self.update_evaluation_layer()
